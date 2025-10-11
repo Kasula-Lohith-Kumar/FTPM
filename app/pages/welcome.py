@@ -1,5 +1,5 @@
 import streamlit as st
-import registration as r
+from app import registration as r
 #from app import login 
 import pandas as pd
 from app import authentiation
