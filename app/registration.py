@@ -1,8 +1,8 @@
 import streamlit as st
 import gspread
-from google_sheets import gsheets_operations as gso
-from google_sheets import gsheets_config as gsc
-import app.authentication as authentication
+from ..google_sheets import gsheets_operations as gso
+from ..google_sheets import gsheets_config as gsc
+import authentication
 
 REG_COL_INDEX = 0
 REG_COL_RANGE = 'A1:D1'
