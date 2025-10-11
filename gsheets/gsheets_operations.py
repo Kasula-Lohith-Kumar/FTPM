@@ -1,19 +1,36 @@
 import pandas as pd
-from gsheets_main import *
+# from gsheets_main import *
 import gspread
+from gsheets import gsheets_config as gsc
 from google.oauth2.service_account import Credentials
 from gspread import Client, Spreadsheet
 
 
+
+def get_worksheet(key_file_path, spreadsheet_id, created_tab):
+    gc = authenticate(key_file_path)
+    spreadsheet = gc.open_by_key(spreadsheet_id)
+    worksheet = spreadsheet.worksheet(created_tab)
+    return worksheet
+
+
 def connect_to_worksheet(
         spreadsheet_id: str,
-        worksheet_name: str,
         key_file_path: str = 'service_account_key.json'):
     try:
-        gc = authenticate(key_file_path)
-        spreadsheet = gc.open_by_key(spreadsheet_id)
-        worksheet = spreadsheet.worksheet(worksheet_name)
-        print(f"Successfully connected to worksheet '{worksheet_name}'")
+        created_tab = create_new_worksheet_tab(
+            spreadsheet_id=gsc.SPREADSHEET_ID,
+            new_worksheet_name=gsc.USERS_TAB_NAME,
+            key_file_path=gsc.KEY_FILE_LOCATION
+        )
+        print(f'Created Tab : {created_tab}', type(created_tab))
+
+        worksheet = get_worksheet(key_file_path, spreadsheet_id, created_tab)
+        # gc = authenticate(key_file_path)
+        # spreadsheet = gc.open_by_key(spreadsheet_id)
+        # worksheet = spreadsheet.worksheet(created_tab)
+        # print(f"Successfully connected to worksheet '{created_tab}'")
+
         return worksheet
     except Exception as e:
         print(f"Error connecting to sheet: {e}")

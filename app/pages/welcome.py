@@ -1,5 +1,8 @@
 import streamlit as st
-import registration as r 
+import registration as r
+from app import login 
+import pandas as pd
+from app import authentiation
 
 # Hides the default sidebar
 st.markdown("""
@@ -56,9 +59,15 @@ def run():
         # The login logic would involve reading the Google Sheet to check the credentials.
         username_login = st.text_input("Username")
         password_login = st.text_input("Password", type="password")
+
+        if authentiation.login_verification(username_login, password_login):
+            print("✅ Login successful!")
+            print(f'Welcome to Finance App {username_login}!')
+        else:
+            print("❌ Login failed: Incorrect password.")
+        
         if st.button("Login"):
             st.info("Login logic goes here (check credentials against your Google Sheet data).")
-        
     
     st.markdown("""
         <style>
