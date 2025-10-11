@@ -1,7 +1,7 @@
 import pandas as pd
 # from gsheets_main import *
 import gspread
-from gsheets import gsheets_config as gsc
+from google_sheets import gsheets_config as gsc
 from google.oauth2.service_account import Credentials
 from gspread import Client, Spreadsheet
 
