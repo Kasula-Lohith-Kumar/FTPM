@@ -1,7 +1,7 @@
 import streamlit as st
 import registration as r
 import pandas as pdd
-import authentiation
+import app.authentication as authentication
 
 # Hides the default sidebar
 st.markdown("""
@@ -59,7 +59,7 @@ def run():
         username_login = st.text_input("Username")
         password_login = st.text_input("Password", type="password")
 
-        if authentiation.login_verification(username_login, password_login):
+        if authentication.login_verification(username_login, password_login):
             print("✅ Login successful!")
             print(f'Welcome to Finance App {username_login}!')
         else:
