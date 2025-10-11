@@ -3,8 +3,8 @@ import gspread
 from google.oauth2.service_account import Credentials
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from .. import gsheets.gsheets_operations as gso
-from .. import gsheets.gsheets_config as gsc
+from gsheets import gsheets_operations as gso
+from gsheets import gsheets_config as gsc
 from app import authentiation
 
 REG_COL_INDEX = 0
