@@ -1,13 +1,25 @@
 import streamlit as st
-import home, authentiation
-# import new
+from pages import home
 import registration as r
 
-PAGES = {
-    "Home": home,
-    "Autentication" : authentiation
-}
+# Hides the default sidebar
+st.markdown("""
+    <style>
+        [data-testid="stSidebarNav"] {display: none;}
+        section[data-testid="stSidebar"] {display: none;}
+        [data-testid="collapsedControl"] {display: none;}
+    </style>
+""", unsafe_allow_html=True)
 
+st.markdown("""
+    <style>
+        .block-container {
+            padding-left: 6rem;
+            padding-right: 2rem;
+            padding-top: 0rem;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
@@ -18,6 +30,12 @@ if __name__ == "__main__":
     # show_home_content()
     if st.session_state['page_status'] == 'home':
         home.show_home_content()
+
+    if st.button("Launch Your Portfolio Dashboard 🚀", use_container_width=True):
+        st.switch_page("pages/welcome.py")
+
+    # if st.session_state['page_status'] == 'welcome':
+    #     welcome.run()
 
     elif st.session_state['page_status'] == 'auth':
         authentiation.show_auth_options()

@@ -33,7 +33,7 @@ def show_home_content():
 
     st.markdown("---")
     st.subheader("Ready to Start?")
-    st.button("Launch Your Portfolio Dashboard 🚀", use_container_width=True)
+    # st.button("Launch Your Portfolio Dashboard 🚀", use_container_width=True)
     # The sidebar navigation should link to key pages here as well.
 
 

@@ -1,0 +1,30 @@
+# Python-related
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.env
+.env
+
+# Virtual environments
+venv/
+.venv/
+
+# IDEs / editors
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Streamlit or other app configs
+.streamlit/secrets.toml
+config.ini
+key.py
+
+# Logs
+*.log
+
+# Cache
+.cache/
