@@ -1,8 +1,8 @@
 import streamlit as st
 import gspread
-from gsheets import gsheets_operations as gso
-from gsheets import gsheets_config as gsc
-import authentiation
+from google_sheets import gsheets_operations as gso
+from google_sheets import gsheets_config as gsc
+import app.authentication as authentication
 
 REG_COL_INDEX = 0
 REG_COL_RANGE = 'A1:D1'
@@ -19,7 +19,7 @@ def registration_form():
         registration_details['Full_Name'] = full_name
 
         email = st.text_input("Email Address *", help="Used for important updates.")
-        email_status = authentiation.validate_email_format(email)
+        email_status = authentication.validate_email_format(email)
         registration_details['Email'] = email
 
         st.markdown("---")
@@ -59,7 +59,7 @@ def registration_form():
                         registration_details['Password']
                         # You might want to store a timestamp here too
                     ]
-                    result = authentiation.check_for_duplicates(sheet, registration_details['Email'],
+                    result = authentication.check_for_duplicates(sheet, registration_details['Email'],
                                                                   registration_details['User_Name'])
                     try:
                         # Append the new row to the sheet, gspread automatically increments the row
