@@ -1,7 +1,7 @@
 import streamlit as st
 import gspread
-from ..google_sheets import gsheets_operations as gso
-from ..google_sheets import gsheets_config as gsc
+from google_sheets import gsheets_operations as gso
+from google_sheets import gsheets_config as gsc
 import authentication
 
 REG_COL_INDEX = 0
