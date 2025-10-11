@@ -2,10 +2,9 @@ import streamlit as st
 import gspread
 from google.oauth2.service_account import Credentials
 import sys, os
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from gsheets import gsheets_operations as gso
-from gsheets import gsheets_config as gsc
-from app import authentiation
+from .gsheets import gsheets_operations as gso
+from .gsheets import gsheets_config as gsc
+from . import authentiation
 
 REG_COL_INDEX = 0
 REG_COL_RANGE = 'A1:D1'
