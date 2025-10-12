@@ -1,8 +1,9 @@
-import streamlit as st 
+import streamlit as st
 
 SPREADSHEET_ID = '1TxGh-JuEWEmopvpHosUnDfstPGSYH_CzzOJCkCTWuaE'
 USERS_TAB_NAME = "UserData"
 KEY_FILE_LOCATION = st.secrets["gcp_service_account"]
+st.write(KEY_FILE_LOCATION)
 WORKSHEET = None
 EMAIL_COL_INDEX = 2
 USER_NAME_COL_INDEX = 3
