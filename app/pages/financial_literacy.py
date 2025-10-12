@@ -18,12 +18,16 @@ hide_default_format = """
 """
 st.markdown(hide_default_format, unsafe_allow_html=True)
 
+if 'page_status' not in st.session_state:
+    st.session_state['page_status'] = 'login' # Start at login/home page
+    st.switch_page("pages/login.py")
+
 # --- USER SESSION ---
-if "user_name" not in st.session_state:
-    st.session_state.user_name = "Lohith"
+if "username" not in st.session_state:
+    st.session_state.username = "Unknown user"
 
 # --- HEADER ---
-st.markdown(f"### 👋 Welcome, **{st.session_state.user_name}!**")
+st.markdown(f"### 👋 Welcome, **{st.session_state.username}!**")
 st.caption("Continue your personalized finance learning journey below.")
 
 st.title("💸 Finance Learning Path")
