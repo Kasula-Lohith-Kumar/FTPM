@@ -2,7 +2,6 @@ import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import streamlit as st
 from pages import home
-import registration as r
 import json
 from google_sheets import gsheets_config as gsc
 
