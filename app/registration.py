@@ -68,7 +68,7 @@ def registration_form():
                                 write_headers_to_worksheet(sheet, REG_COL_RANGE)
                             
                             sheet.append_row(user_data)
-                            st.success(f"✅ Registration successful for '{username}'! Data saved.")
+                            st.success(f"✅ Registration successful for '{username}'!")
                             registration_details['Status'] = True
                         else:
                             st.error(f"❌ Registration Filed for '{username}', user-name or e-mail already exists")
