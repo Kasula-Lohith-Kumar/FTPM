@@ -25,8 +25,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def is_streamlit_cloud() -> bool:
-    """Detect if running inside Streamlit Cloud deployment."""
-    return "STREAMLIT_RUNTIME" in os.environ
+    """Detect Streamlit Cloud by checking if st.secrets has Streamlit-managed credentials."""
+    try:
+        _ = st.secrets["gcp_service_account"]
+        return True
+    except Exception:
+        return False
 
 def load_key_file_data():
     """
