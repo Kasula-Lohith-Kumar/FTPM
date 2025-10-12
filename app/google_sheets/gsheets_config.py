@@ -4,6 +4,7 @@ import json
 SPREADSHEET_ID = '1TxGh-JuEWEmopvpHosUnDfstPGSYH_CzzOJCkCTWuaE'
 USERS_TAB_NAME = "UserData"
 KEY_FILE_LOCATION = json.loads(st.secrets["gcp_service_account"])
+print(KEY_FILE_LOCATION)
 WORKSHEET = None
 EMAIL_COL_INDEX = 2
 USER_NAME_COL_INDEX = 3
