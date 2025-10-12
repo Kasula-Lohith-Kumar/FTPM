@@ -1,9 +1,8 @@
 import gspread
-import gsheets_config as gsc
-import gsheets_operations as gso
+import google_sheets.gsheets_config as gsc
+import google_sheets.gsheets_operations as gso
 from google.oauth2.service_account import Credentials
 import pandas as pd
-import gsheets_config as gsc
 
 
 
