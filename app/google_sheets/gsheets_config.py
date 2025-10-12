@@ -1,4 +1,5 @@
 SPREADSHEET_ID = '1TxGh-JuEWEmopvpHosUnDfstPGSYH_CzzOJCkCTWuaE'
+LOCAL_KEY_PATH = r"app\google_sheets\financetutorapp-562157097710.json"
 USERS_TAB_NAME = "UserData"
 KEY_FILE_DATA = None
 WORKSHEET = None

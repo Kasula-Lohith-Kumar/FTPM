@@ -29,16 +29,47 @@ def is_streamlit_cloud() -> bool:
     """Detect if running inside Streamlit Cloud deployment."""
     return "STREAMLIT_RUNTIME" in os.environ
 
+def load_key_file_data():
+    """
+    Loads Google Service Account credentials.
+    Handles both local and Streamlit Cloud environments safely.
+    """
+    try:
+        if is_streamlit_cloud():
+            print("🌐 STREAMLIT_RUNTIME detected — loading from Streamlit secrets...")
+            key_data = json.loads(st.secrets["gcp_service_account"])
+        else:
+            print("💻 LOCAL_RUNTIME detected — loading from local JSON file...")
+            with open(gsc.LOCAL_KEY_PATH, "r") as file:
+                key_data = json.load(file)
+        
+        print("✅ Successfully loaded GCP key data.")
+        return key_data
+
+    except FileNotFoundError as e:
+        print(f"❌ Local key file not found: {e}")
+        st.error("Local service account key file missing.")
+        return None
+
+    except KeyError as e:
+        print(f"❌ Missing key in Streamlit secrets: {e}")
+        st.error("Missing 'gcp_service_account' entry in Streamlit secrets.")
+        return None
+
+    except json.JSONDecodeError as e:
+        print(f"❌ Invalid JSON format: {e}")
+        st.error("Service account file contains invalid JSON.")
+        return None
+
+    except Exception as e:
+        print(f"⚠️ Unexpected error while loading key data: {e}")
+        st.error(f"Unexpected error: {e}")
+        return None
+
 
 if __name__ == "__main__":
 
-    if is_streamlit_cloud():
-        print('STREAMLIT_RUNTIME')
-        json.loads(st.secrets["gcp_service_account"])
-    else:
-        print('LOCAL_RUNTIME')
-        with open(r'app\google_sheets\financetutorapp-562157097710.json', 'r') as file:
-            gsc.KEY_FILE_DATA= json.load(file)
+    gsc.KEY_FILE_DATA = load_key_file_data()
 
     if 'page_status' not in st.session_state:
         st.session_state['page_status'] = 'home'
