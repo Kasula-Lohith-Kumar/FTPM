@@ -28,3 +28,6 @@ key.py
 
 # Cache
 .cache/
+
+#service account files
+google_sheets/financetutorapp-562157097710.json
