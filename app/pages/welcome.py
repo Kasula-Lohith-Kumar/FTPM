@@ -1,7 +1,7 @@
 import streamlit as st
 import registration as r
 import pandas as pdd
-from app import authentication
+import authentication
 
 # Hides the default sidebar
 st.markdown("""
