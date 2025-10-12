@@ -5,8 +5,6 @@ from google.oauth2.service_account import Credentials
 import pandas as pd
 
 
-
-
 if __name__ == '__main__':
     # Run the function
 
@@ -17,6 +15,7 @@ if __name__ == '__main__':
         print(type(worksheet))
         gso.write(worksheet, 'B1', 'User Name')
         gso.clear(worksheet, 'B1')
+
 
 
 

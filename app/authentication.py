@@ -19,7 +19,7 @@ def login_verification(input_username: str, input_password: str) -> bool:
         bool: True if login is successful, False otherwise.
     """
     try:
-        worksheet = gso.get_worksheet(gsc.KEY_FILE_LOCATION, gsc.SPREADSHEET_ID, gsc.USERS_TAB_NAME)
+        worksheet = gso.get_worksheet(gsc.KEY_FILE_DATA, gsc.SPREADSHEET_ID, gsc.USERS_TAB_NAME)
         user_records = worksheet.get_all_records()
         
         # 3. SEARCH FOR USERNAME AND VERIFY PASSWORD

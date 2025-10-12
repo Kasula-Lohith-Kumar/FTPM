@@ -7,8 +7,8 @@ from gspread import Client, Spreadsheet
 
 
 
-def get_worksheet(key_file_path, spreadsheet_id, created_tab):
-    gc = authenticate(key_file_path)
+def get_worksheet(key_file_data, spreadsheet_id, created_tab):
+    gc = authenticate(key_file_data)
     spreadsheet = gc.open_by_key(spreadsheet_id)
     worksheet = spreadsheet.worksheet(created_tab)
     return worksheet
@@ -16,16 +16,16 @@ def get_worksheet(key_file_path, spreadsheet_id, created_tab):
 
 def connect_to_worksheet(
         spreadsheet_id: str,
-        key_file_path: str = 'service_account_key.json'):
+        key_file_data):
     try:
         created_tab = create_new_worksheet_tab(
+            gsc.KEY_FILE_DATA,
             spreadsheet_id=gsc.SPREADSHEET_ID,
-            new_worksheet_name=gsc.USERS_TAB_NAME,
-            key_file_path=gsc.KEY_FILE_LOCATION
+            new_worksheet_name=gsc.USERS_TAB_NAME
         )
         print(f'Created Tab : {created_tab}', type(created_tab))
 
-        worksheet = get_worksheet(key_file_path, spreadsheet_id, created_tab)
+        worksheet = get_worksheet(key_file_data, spreadsheet_id, created_tab)
         # gc = authenticate(key_file_path)
         # spreadsheet = gc.open_by_key(spreadsheet_id)
         # worksheet = spreadsheet.worksheet(created_tab)
@@ -36,19 +36,19 @@ def connect_to_worksheet(
         print(f"Error connecting to sheet: {e}")
         # Handle connection error, e.g., check your ID and sharing permissions.
 
-def authenticate(key_file_path: str = 'service_account_key.json'):
+def authenticate(key_file_data):
     # 1. Authenticate the Service Account
-    credentials = Credentials.from_service_account_file(key_file_path, scopes=gsc.SCOPES)
+    credentials = Credentials.from_service_account_info(key_file_data, scopes=gsc.SCOPES)
     gc: Client = gspread.authorize(credentials)
     return gc
 
 def create_new_worksheet_tab(
+        key_file_data,
         spreadsheet_id: str,
         new_worksheet_name: str,
         rows: int = 100,
-        cols: int = 20,
-        key_file_path: str = 'service_account_key.json'
-) -> str:
+        cols: int = 20
+    ) -> str:
     """
     Creates a new worksheet (tab) inside an existing Google Spreadsheet file.
 
@@ -67,11 +67,11 @@ def create_new_worksheet_tab(
 
     try:
 
-        gc = authenticate(key_file_path)
+        gc = authenticate(key_file_data)
         if gc:
             print('Authentication Successful : Creating New Sheet...')
 
-        if worksheet_exists(gc, spreadsheet_id, new_worksheet_name, key_file_path):
+        if worksheet_exists(gc, spreadsheet_id, new_worksheet_name):
             print(f'File Already exists : {new_worksheet_name}:{type(new_worksheet_name)}')
             return new_worksheet_name
 
@@ -122,8 +122,7 @@ from gspread import Spreadsheet
 def worksheet_exists(
         client: object,
         spreadsheet_id: str,
-        worksheet_name: str,
-        key_file_path: str = 'service_account_key.json') -> bool:
+        worksheet_name: str) -> bool:
     """
     Checks if a worksheet with a given name exists in the target spreadsheet.
 
