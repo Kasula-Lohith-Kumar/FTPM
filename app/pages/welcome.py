@@ -115,6 +115,9 @@ def run():
             st.markdown('<div style="background-color: #262730; padding: 10px 15px; border-radius: 8px; border-left: 5px solid #007bff;"><span style="color: #6c757d;">📊 Launching Data Visualization Module...</span></div>', unsafe_allow_html=True)
         elif st.session_state.selected_option == "Financial Literacy":
             st.markdown('<div style="background-color: #262730; padding: 10px 15px; border-radius: 8px; border-left: 5px solid #007bff;"><span style="color: #6c757d;">🧭 Opening Financial Learning Resources...</span></div>', unsafe_allow_html=True)
+            st.session_state['focus_area'] = 'literacy'
+            st.switch_page("pages/financial_literacy.py")
+
         elif st.session_state.selected_option == "Portfolio Tracking":
             st.markdown('<div style="background-color: #262730; padding: 10px 15px; border-radius: 8px; border-left: 5px solid #007bff;"><span style="color: #6c757d;">💼 Loading Portfolio Tracker...</span></div>', unsafe_allow_html=True)
 
