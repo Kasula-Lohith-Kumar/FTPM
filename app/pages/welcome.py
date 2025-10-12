@@ -123,19 +123,21 @@ def run():
         st.markdown('<div class="floating-btn">', unsafe_allow_html=True)
         if st.button("🚪🏃 Log Out", key="float_back"):
             if 'selected_option' in st.session_state:
-                del st.session_state.selected_option 
-                del st.session_state['username']
-            st.markdown('</div>', unsafe_allow_html=True)
+                del st.session_state.selected_option
             st.session_state['page_status'] = 'home'
             st.switch_page("finance_app_main.py")
+        st.markdown('</div>', unsafe_allow_html=True)
 
 
 # ... (rest of the initialization code remains the same)
 if 'page_status' not in st.session_state:
-    st.session_state['page_status'] = 'welcome'
+    st.session_state['page_status'] = 'login' # Start at login/home page
+    st.switch_page("pages/login.py")
 
 if 'username' not in st.session_state:
-    st.session_state['username'] = 'Unknown User'
+    # A username doesn't exist yet, so we don't set a default display name.
+    # We just ensure the key exists, but it's okay to leave it blank or None for now.
+    st.session_state['username'] = None 
 
 if st.session_state['page_status'] == 'welcome':
     run()
