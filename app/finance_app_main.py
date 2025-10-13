@@ -1,28 +1,8 @@
 import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import streamlit as st
-from pages import home
 import json
-from google_sheets import gsheets_config as gsc
-
-# Hides the default sidebar
-st.markdown("""
-    <style>
-        [data-testid="stSidebarNav"] {display: none;}
-        section[data-testid="stSidebar"] {display: none;}
-        [data-testid="collapsedControl"] {display: none;}
-    </style>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-    <style>
-        .block-container {
-            padding-left: 6rem;
-            padding-right: 2rem;
-            padding-top: 0rem;
-        }
-    </style>
-""", unsafe_allow_html=True)
+from app.google_sheets import gsheets_config as gsc
 
 def is_streamlit_cloud() -> bool:
     """Detect Streamlit Cloud by checking if st.secrets has Streamlit-managed credentials."""
@@ -68,32 +48,18 @@ def load_key_file_data():
         print(f"⚠️ Unexpected error while loading key data: {e}")
         st.error(f"Unexpected error: {e}")
         return None
-
-
-if __name__ == "__main__":
+    
+def  run():
 
     gsc.KEY_FILE_DATA = load_key_file_data()
 
     if 'page_status' not in st.session_state:
         st.session_state['page_status'] = 'home'
 
-    # show_home_content()
     if st.session_state['page_status'] == 'home':
-        home.show_home_content()
+        st.switch_page("pages/home.py")
 
-    # if st.button("Launch Your Portfolio Dashboard 🚀", use_container_width=True):
-    #     st.session_state['page_status'] = 'login'
-    #     st.switch_page("pages/login.py")
 
-    # if st.session_state['page_status'] == 'welcome':
-    #     st.switch_page("pages/welcome.py")
+if __name__ == "__main__":
 
-    # elif st.session_state['page_status'] == 'auth':
-    #     authentiation.show_auth_options()
-
-    # elif st.session_state['page_status'] == 'dashboard':
-    #     st.title("Welcome to Your Portfolio Dashboard! 📈")
-    #     # This is where your main app functionality would live
-    #     if st.button("Logout"):
-    #         st.session_state['page_status'] = 'home'
-    #         # st.experimental_rerun()
+    run()

@@ -124,7 +124,7 @@ def run():
     button_container = st.container()
     with button_container:
         st.markdown('<div class="floating-btn">', unsafe_allow_html=True)
-        if st.button("🚪🏃 Log Out", key="float_back"):
+        if st.button("🚪🏃 Logout", key="float_back"):
             if 'selected_option' in st.session_state:
                 del st.session_state.selected_option
             st.session_state['page_status'] = 'home'
@@ -143,4 +143,5 @@ if 'username' not in st.session_state:
     st.session_state['username'] = None 
 
 if st.session_state['page_status'] == 'welcome':
+    print(st.session_state)
     run()

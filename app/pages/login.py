@@ -1,7 +1,6 @@
 import streamlit as st
-import registration as r
-import pandas as pdd
-import authentication
+from app.security import registration as reg
+from app.security import authentication as aut
 
 # Hides the default sidebar
 st.markdown("""
@@ -39,7 +38,7 @@ def run():
 
     with tab2:
     # Call the registration form and check its return value
-        registration_status = r.registration_form()
+        registration_status = reg.registration_form()
     
         if registration_status:
             # If registration was successful, hide the form 
@@ -59,7 +58,7 @@ def run():
         username_login = st.text_input("Username")
         password_login = st.text_input("Password", type="password")
 
-        if authentication.login_verification(username_login, password_login):
+        if aut.login_verification(username_login, password_login):
             print(f'Welcome to Finance App {username_login}!')
         else:
             print("❌ Login failed: Incorrect UserName/Password.")
