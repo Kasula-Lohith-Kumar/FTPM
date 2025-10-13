@@ -90,6 +90,8 @@ def run():
             st.switch_page("finance_app_main.py")
         st.markdown('</div>', unsafe_allow_html=True)
 
+if 'page_status' not in st.session_state:
+    st.session_state['page_status'] = 'home'
 
 if st.session_state['page_status'] == 'login':
     status = run()
