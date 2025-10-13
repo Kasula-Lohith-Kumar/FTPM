@@ -1,6 +1,7 @@
 import streamlit as st
 from security import registration as reg
 from security import authentication as aut
+from pages import home
 
 # Hides the default sidebar
 st.markdown("""
@@ -92,6 +93,7 @@ def run():
 
 if 'page_status' not in st.session_state:
     st.session_state['page_status'] = 'home'
+    home.show_home_content()
 
 if st.session_state['page_status'] == 'login':
     status = run()
