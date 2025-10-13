@@ -1,6 +1,6 @@
 import streamlit as st
-from app.security import registration as reg
-from app.security import authentication as aut
+from security import registration as reg
+from security import authentication as aut
 
 # Hides the default sidebar
 st.markdown("""
