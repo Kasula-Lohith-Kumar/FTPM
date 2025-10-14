@@ -51,8 +51,6 @@ def load_key_file_data():
     
 def  run():
 
-    gsc.KEY_FILE_DATA = load_key_file_data()
-
     if 'page_status' not in st.session_state:
         st.session_state['page_status'] = 'home'
 
@@ -61,5 +59,7 @@ def  run():
 
 
 if __name__ == "__main__":
+
+    gsc.KEY_FILE_DATA = load_key_file_data()
 
     run()

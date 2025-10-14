@@ -59,17 +59,15 @@ def run():
         username_login = st.text_input("Username")
         password_login = st.text_input("Password", type="password")
 
-        if aut.login_verification(username_login, password_login):
-            print(f'Welcome to Finance App {username_login}!')
-        else:
-            print("❌ Login failed: Incorrect UserName/Password.")
-        
         if st.button("Login"):
-            st.info("✅ Login successful!")
-            st.session_state['page_status'] = 'welcome'
-            st.session_state['username'] = username_login
-            return st.session_state['page_status'] 
-            st.info("Login logic goes here (check credentials against your Google Sheet data).")
+            if aut.login_verification(username_login, password_login):
+                print(f'Welcome to Finance App {username_login}!')
+                st.info("✅ Login successful!")
+                st.session_state['page_status'] = 'welcome'
+                st.session_state['username'] = username_login
+                return st.session_state['page_status'] 
+            else:
+                st.error("❌ Login failed: Incorrect UserName/Password.")
     
     st.markdown("""
         <style>
