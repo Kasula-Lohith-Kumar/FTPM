@@ -176,8 +176,11 @@ else:
 
 # Display each canonical section, but show localized title & localized topics
 for s_index, canon in enumerate(canonical_sections):
+    print(f'canonical_sections : {canonical_sections}')
     loc_section_title = section_title_map[canon]
+    print(f'loc_section_title : {loc_section_title}')
     subtopics = topics_localized_by_canonical[canon]
+    print(f'subtopics : {subtopics}')
 
     with st.expander(f"📂 {loc_section_title}", expanded=False):
         section_locked = s_index > section_unlock_index
@@ -196,11 +199,14 @@ for s_index, canon in enumerate(canonical_sections):
                 st.success(f"✅ {topic_localized} (Completed)")
             elif topic_state == "Start":
                 if st.button(f"▶️ {topic_localized}"):
-                    st.session_state.selected_topic = (canon, i, topic_localized)
+                    st.session_state.selected_topic = (canon, i, topic_localized)   
+                    print(f'st.session_state.selected_topic : {st.session_state.selected_topic}')
+                    st.switch_page("pages/fl_topic.py")
             else:  # default -> set to Start (available to start)
                 st.session_state.completed_topics[canon][i] = "Start"
                 if st.button(f"▶️ {topic_localized}"):
                     st.session_state.selected_topic = (canon, i, topic_localized)
+                    st.switch_page("pages/fl_topic.py")
 
 # # --- TOPIC PROMPT AREA ---
 # if "selected_topic" in st.session_state:
