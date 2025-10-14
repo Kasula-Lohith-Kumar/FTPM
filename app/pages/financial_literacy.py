@@ -1,5 +1,5 @@
 import streamlit as st
-from app.pages import fl_config
+from pages import fl_config
 from app import finance_app_main
 
 # Hides the default sidebar

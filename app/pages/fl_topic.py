@@ -3,7 +3,7 @@ from gtts import gTTS
 from streamlit_mic_recorder import mic_recorder
 import io
 from openai import OpenAI
-from app.pages import fl_config
+from pages import fl_config
 
 # ------------------------------------
 # 🧠 INITIAL SETUP
