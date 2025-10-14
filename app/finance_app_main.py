@@ -2,7 +2,7 @@ import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import streamlit as st
 import json
-from app.google_sheets import gsheets_config as gsc
+from google_sheets import gsheets_config as gsc
 
 def is_streamlit_cloud() -> bool:
     """Detect Streamlit Cloud by checking if st.secrets has Streamlit-managed credentials."""
