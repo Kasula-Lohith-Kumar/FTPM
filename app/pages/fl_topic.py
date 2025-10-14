@@ -3,95 +3,36 @@ from gtts import gTTS
 from streamlit_mic_recorder import mic_recorder
 import io
 from openai import OpenAI
+from app.pages import fl_config
 
 # ------------------------------------
 # 🧠 INITIAL SETUP
 # ------------------------------------
 st.set_page_config(page_title="Finance Tutor", layout="wide")
 
+# Ensure required state variables are initialized (defensive programming)
 if "user_name" not in st.session_state:
     st.session_state.user_name = "Lohith"
 if "selected_topic" not in st.session_state:
+    # Default topic structure: (canonical_section_name, topic_index, localized_topic_name)
     st.session_state.selected_topic = ("Finance Fundamentals", 0, "Introduction to Finance")
+if "canon_topic_index" not in st.session_state:
+    # Default index structure: (section_index, topic_index)
+    st.session_state.canon_topic_index = (0, 0) 
 if "quiz_completed" not in st.session_state:
     st.session_state.quiz_completed = False
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "language" not in st.session_state:
-    st.session_state.language = "english"  # english, telugu, hindi, tamil, kannada
-
-# ------------------------------------
-# 🌐 TRANSLATION DICTIONARY
-# ------------------------------------
-translations = {
-    "english": {
-        "welcome": "Welcome",
-        "learning_material": "Learning Material",
-        "topic_intro": "This is where the learning content for this topic will appear — videos, notes, or quizzes.",
-        "take_quiz": "Take Quiz",
-        "quiz_completed": "Quiz completed! You can proceed to the next topic.",
-        "next": "Next",
-        "previous": "Previous",
-        "back": "Back to Dashboard",
-        "speak_button": "🔊 Listen to Lesson",
-        "mic_button": "🎙️ Speak to Chatbot",
-    },
-    "తెలుగు (Telugu)": {
-        "welcome": "స్వాగతం",
-        "learning_material": "పాఠ్యాంశం",
-        "topic_intro": "ఈ అంశానికి సంబంధించిన వీడియోలు, గమనికలు లేదా క్విజ్‌లు ఇక్కడ కనిపిస్తాయి.",
-        "take_quiz": "క్విజ్ ప్రారంభించండి",
-        "quiz_completed": "క్విజ్ పూర్తయింది! తదుపరి అంశానికి వెళ్ళవచ్చు.",
-        "next": "తర్వాత",
-        "previous": "మునుపటి",
-        "back": "డాష్‌బోర్డ్‌కి తిరిగి",
-        "speak_button": "🔊 పాఠాన్ని వినండి",
-        "mic_button": "🎙️ బాట్‌తో మాట్లాడండి",
-    },
-    "हिंदी (Hindi)": {
-        "welcome": "स्वागत है",
-        "learning_material": "अध्ययन सामग्री",
-        "topic_intro": "यहाँ इस विषय की सामग्री दिखाई देगी — वीडियो, नोट्स या क्विज़।",
-        "take_quiz": "क्विज़ शुरू करें",
-        "quiz_completed": "क्विज़ पूरा हुआ! अब आप अगले विषय पर जा सकते हैं।",
-        "next": "अगला",
-        "previous": "पिछला",
-        "back": "डैशबोर्ड पर वापस जाएं",
-        "speak_button": "🔊 पाठ सुनें",
-        "mic_button": "🎙️ चैटबॉट से बात करें",
-    },
-    "தமிழ் (Tamil)": {
-        "welcome": "வரவேற்கிறோம்",
-        "learning_material": "கற்றல் உள்ளடக்கம்",
-        "topic_intro": "இந்த தலைப்புக்கான வீடியோக்கள், குறிப்புகள் அல்லது வினாடி வினா இங்கே தோன்றும்.",
-        "take_quiz": "வினாடி வினா தொடங்கவும்",
-        "quiz_completed": "வினாடி வினா முடிந்தது! அடுத்த தலைப்புக்குச் செல்லலாம்.",
-        "next": "அடுத்தது",
-        "previous": "முந்தையது",
-        "back": "டாஷ்போர்டுக்கு திரும்பவும்",
-        "speak_button": "🔊 பாடத்தை கேட்கவும்",
-        "mic_button": "🎙️ போட் உடன் பேசவும்",
-    },
-    "ಕನ್ನಡ (Kannada)": {
-        "welcome": "ಸ್ವಾಗತ",
-        "learning_material": "ಅಧ್ಯಯನ ವಿಷಯ",
-        "topic_intro": "ಈ ವಿಷಯಕ್ಕೆ ಸಂಬಂಧಿಸಿದ ವೀಡಿಯೊಗಳು, ಟಿಪ್ಪಣಿಗಳು ಅಥವಾ ಕ್ವಿಜ್‌ಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.",
-        "take_quiz": "ಕ್ವಿಜ್ ಪ್ರಾರಂಭಿಸಿ",
-        "quiz_completed": "ಕ್ವಿಜ್ ಪೂರ್ಣಗೊಂಡಿದೆ! ಮುಂದಿನ ವಿಷಯಕ್ಕೆ ಹೋಗಬಹುದು.",
-        "next": "ಮುಂದಿನದು",
-        "previous": "ಹಿಂದಿನದು",
-        "back": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ಗೆ ಹಿಂತಿರುಗಿ",
-        "speak_button": "🔊 ಪಾಠವನ್ನು ಕೇಳಿ",
-        "mic_button": "🎙️ ಬಾಟ್‌ನೊಂದಿಗೆ ಮಾತನಾಡಿ",
-    }
-}
+    st.session_state.language = "English"  # Must match a key in fl_config.translations
 
 # ------------------------------------
 # 🎧 TTS FUNCTION
 # ------------------------------------
 def get_tts_lang(language):
+    """Maps the display language name to the gTTS language code."""
     mapping = {
-        "english": "en",
+        "English": "en",
         "తెలుగు (Telugu)": "te",
         "हिंदी (Hindi)": "hi",
         "தமிழ் (Tamil)": "ta",
@@ -102,38 +43,102 @@ def get_tts_lang(language):
 def speak_text(text, language):
     """Generate voice from text."""
     lang_code = get_tts_lang(language)
-    tts = gTTS(text=text, lang=lang_code)
-    audio_bytes = io.BytesIO()
-    tts.write_to_fp(audio_bytes)
-    audio_bytes.seek(0)
-    st.audio(audio_bytes, format="audio/mp3")
+    try:
+        tts = gTTS(text=text, lang=lang_code)
+        audio_bytes = io.BytesIO()
+        tts.write_to_fp(audio_bytes)
+        audio_bytes.seek(0)
+        st.audio(audio_bytes, format="audio/mp3")
+    except Exception as e:
+        st.error(f"Error generating audio: {e}")
 
 # ------------------------------------
-# 📘 PAGE HEADER
+# 📘 PAGE HEADER & LANGUAGE LOGIC
 # ------------------------------------
+# Initial load of language/translations
+lang = st.session_state.language
+t = fl_config.translations[lang]
 chapter_name, topic_index, topic_title = st.session_state.selected_topic
-t = translations[st.session_state.language]
 
 st.markdown(
     f"""
     <div style="background-color:#0f1724; padding:18px; border-radius:10px; color:white;">
         <h2>👋 {t['welcome']}, {st.session_state.user_name}!</h2>
-        <p>📘 {chapter_name} | 🧩 {topic_title}</p>
+        <p>📘 {st.session_state.selected_topic[0]} | 🧩 {st.session_state.selected_topic[2]}</p>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
+# --- LANGUAGE SELECTION ---
+prev_lang = st.session_state.language
+st.markdown(f"### {fl_config.translations[prev_lang]['choose_language']}")
+
+language = st.selectbox(
+    "",
+    options=list(fl_config.translations.keys()),
+    index=list(fl_config.translations.keys()).index(prev_lang),
+    key="language_selector",
+)
+
+# ⭐ FIX: Update selected_topic state immediately before rerunning ⭐
+if language != prev_lang:
+    st.session_state.language = language
+    new_lang = st.session_state.language
+    
+    # Get canonical index set in financial_literacy.py (s_index, i)
+    s_index, i = st.session_state.canon_topic_index
+
+    # 1. Get the list of localized section names for the new language
+    localized_section_list = list(fl_config.topics_language[new_lang].keys())
+    
+    # 2. Get the localized section name using the canonical index
+    # We defensively use min() to handle potential length mismatches, 
+    # though ideally the structure is consistent.
+    if s_index < len(localized_section_list):
+        localized_section_name = localized_section_list[s_index]
+    else:
+        # Fallback to current (likely English) name if index is out of bounds
+        localized_section_name = st.session_state.selected_topic[0] 
+
+    # 3. Get the list of localized topic names for that section
+    localized_topic_list = fl_config.topics_language[new_lang].get(localized_section_name, [])
+
+    # 4. Get the localized topic title using the canonical topic index
+    if i < len(localized_topic_list):
+        localized_topic_title = localized_topic_list[i]
+    else:
+        # Fallback to current topic title if index is out of bounds
+        localized_topic_title = st.session_state.selected_topic[2] 
+
+    # 5. Update st.session_state.selected_topic with the new localized strings
+    st.session_state.selected_topic = (
+        localized_section_name,   # Localized Section Name
+        i,                        # Topic Index (canonical)
+        localized_topic_title     # Localized Topic Title
+    )
+
+    # st.rerun() executes after all state updates in this block are complete, 
+    # so the new state will be used on the next run.
+    st.rerun()
+
+# Reload current language variables after potential change
+lang = st.session_state.language
+t = fl_config.translations[lang]
+chapter_name, topic_index, topic_title = st.session_state.selected_topic # Re-unpack updated state
+
 # ------------------------------------
 # 📚 LEARNING MATERIAL
 # ------------------------------------
 st.markdown(f"### 📖 {t['learning_material']}")
-st.info(t["topic_intro"])
+st.info(f"**{topic_title}:** " + t["topic_intro"])
 
 col1, col2 = st.columns([1, 1])
 with col1:
     if st.button(t["speak_button"], key="speaker_button"):
-        speak_text(t["topic_intro"], st.session_state.language)
+        # The text spoken should be the learning material content, 
+        # but for this demo, we'll use the topic_intro string.
+        speak_text(f"{topic_title}. " + t["topic_intro"], st.session_state.language)
 with col2:
     st.write("")  # spacing
 
@@ -144,10 +149,13 @@ st.write("---")
 st.subheader("🧠 " + t["take_quiz"])
 
 if not st.session_state.quiz_completed:
+    # Use topic_title in the quiz content for localization context
+    quiz_question = f"Regarding **{topic_title}**, what is the main goal of finance?"
+    
     if st.button("🚀 Start Quiz"):
         with st.expander("📋 Quiz", expanded=True):
             answer = st.radio(
-                "What is the main goal of finance?",
+                quiz_question,
                 ["A) Spending money", "B) Managing money efficiently", "C) Avoiding all investments"],
                 key="quiz_radio"
             )
@@ -155,6 +163,7 @@ if not st.session_state.quiz_completed:
                 if answer == "B) Managing money efficiently":
                     st.session_state.quiz_completed = True
                     st.success(t["quiz_completed"])
+                    st.toast(t["quiz_completed"])
                 else:
                     st.error("❌ Try again.")
 else:
@@ -164,7 +173,7 @@ else:
 # 💬 CHATBOT WITH VOICE (MIC + SPEAKER in input ribbon)
 # ------------------------------------
 st.write("---")
-st.markdown("### 🤖 Chatbot Assistant")
+st.markdown(f"### {t['assistant']}")
 
 # Chat history display
 for msg in st.session_state.messages:
@@ -198,34 +207,57 @@ with chat_col3:
 
 # --- Process input or voice ---
 if mic_audio:
+    # Logic to transcribe mic_audio and set user_input would go here
     st.audio(mic_audio["bytes"])
-    st.success("🎙️ Voice captured successfully!")
+    st.success("🎙️ Voice captured successfully! (Transcription logic goes here)")
+    # For now, we'll pretend transcription happened and use a dummy input
+    # user_input = "Tell me more about " + topic_title # Use this line if you want to test the full chat flow
 
 if user_input:
+    # 1. Add user message
     st.session_state.messages.append({"role": "user", "content": user_input})
-    reply = f"That's an insightful question about {topic_title}!"
+    
+    # 2. Generate response (Placeholder for OpenAI call)
+    # The actual OpenAI call should be outside this section 
+    # to prevent immediate UI rendering issues, but for simplicity:
+    reply = f"That's an insightful question about {topic_title}! Here is a short dummy reply."
+    
+    # 3. Add assistant message
     st.session_state.messages.append({"role": "assistant", "content": reply})
-    st.rerun()
+    st.rerun() # Rerun to display the new messages
 
 # ------------------------------------
 # 🚪 NAVIGATION
 # ------------------------------------
 st.write("---")
+
+# Navigation callback functions
+def go_to_dashboard():
+    st.switch_page("financial_literacy.py")
+
+def mark_complete_and_go_next():
+    # Placeholder: Logic to mark current topic as 'Yes' and calculate the next one
+    
+    # Current topic is marked as complete:
+    current_canon_name, current_topic_idx, _ = st.session_state.selected_topic
+    if "completed_topics" in st.session_state:
+        st.session_state.completed_topics[current_canon_name][current_topic_idx] = "Yes"
+    
+    st.toast("Topic completed! Proceeding to the next lesson.")
+    go_to_dashboard() # For now, just go back to refresh the dashboard
+
 col1, col2, col3 = st.columns([1, 1, 2])
-col1.button(f"⬅️ {t['previous']}")
-col2.button(f"➡️ {t['next']}", disabled=not st.session_state.quiz_completed)
-col3.button(f"🏠 {t['back']}")
 
+# Previous button (always enabled, goes back to dashboard)
+col1.button(f"⬅️ {t['previous']}", on_click=go_to_dashboard)
 
-#To Do
-# reply = f"That's a great question about {topic_title}! Here’s a short explanation..."
-# with something like:
+# Next button (disabled until quiz is complete)
+# In a real app, this should calculate the next topic and set selected_topic/canon_topic_index
+col2.button(
+    f"➡️ {t['next']}", 
+    disabled=not st.session_state.quiz_completed,
+    on_click=mark_complete_and_go_next
+)
 
-# python
-# Copy code
-# client = OpenAI(api_key="YOUR_KEY")
-# resp = client.chat.completions.create(
-#     model="gpt-4o-mini",
-#     messages=st.session_state.messages
-# )
-# reply = resp.choices[0].message.content
+# Back to Dashboard button
+col3.button(f"🏠 {t['back']}", on_click=go_to_dashboard)

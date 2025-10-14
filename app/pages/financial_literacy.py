@@ -201,11 +201,15 @@ for s_index, canon in enumerate(canonical_sections):
                 if st.button(f"▶️ {topic_localized}"):
                     st.session_state.selected_topic = (canon, i, topic_localized)   
                     print(f'st.session_state.selected_topic : {st.session_state.selected_topic}')
+                    st.session_state['canon_topic_index'] = (s_index, i)
+                    print(f"canon_topic_index : {st.session_state['canon_topic_index']}")
                     st.switch_page("pages/fl_topic.py")
             else:  # default -> set to Start (available to start)
                 st.session_state.completed_topics[canon][i] = "Start"
                 if st.button(f"▶️ {topic_localized}"):
                     st.session_state.selected_topic = (canon, i, topic_localized)
+                    st.session_state['canon_topic_index'] = (s_index, i)
+                    print(f"canon_topic_index : {st.session_state['canon_topic_index']}")
                     st.switch_page("pages/fl_topic.py")
 
 # # --- TOPIC PROMPT AREA ---
@@ -230,7 +234,7 @@ st.markdown("---")
 col1, col2 = st.columns([4, 1])
 with col1:
     st.markdown('<div class="floating-btn">', unsafe_allow_html=True)
-    if st.button("⬅️ Back", key="float_back"):
+    if st.button(f"⬅️ {t['back']}", key="float_back"):
         st.session_state['page_status'] = 'welcome'
         del st.session_state.selected_option
         st.switch_page("pages/welcome.py")
