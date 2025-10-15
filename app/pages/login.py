@@ -28,6 +28,7 @@ def run():
 
     # In your main Streamlit file (e.g., streamlit_app.py):
 
+    print('In Login 🔐 Page')
     st.header("Welcome to the Finance App")
     st.write("Please register or log in to access your portfolio dashboard.")
 
@@ -38,10 +39,12 @@ def run():
     #     r.registration_form()
 
     with tab2:
+        print('✍️ Register tab')
     # Call the registration form and check its return value
         registration_status = reg.registration_form()
     
         if registration_status:
+            print('✅ Registration Sucessful')
             # If registration was successful, hide the form 
             # and display a message pointing to the Login tab (tab1).
         
@@ -53,6 +56,7 @@ def run():
             st.info("✅ **Ready to go!** Please click on the **Login** tab to continue.")
 
     with tab1:
+        print('🔒 Login tab')
         st.subheader("Login")
         # Add your login form fields here (Username, Password)
         # The login logic would involve reading the Google Sheet to check the credentials.
@@ -60,10 +64,12 @@ def run():
         password_login = st.text_input("Password", type="password")
 
         if st.button("Login"):
+            print('Login button press ☑️')
             if aut.login_verification(username_login, password_login):
-                print(f'Welcome to Finance App {username_login}!')
+                print(f'Welcome to Finance App : {username_login}!')
                 st.info("✅ Login successful!")
                 st.session_state['page_status'] = 'welcome'
+                print(f"Page Status : {st.session_state['page_status']}")
                 st.session_state['username'] = username_login
                 return st.session_state['page_status'] 
             else:
@@ -83,19 +89,26 @@ def run():
     # Create container for the button
     button_container = st.container()
     with button_container:
+        print('Button Container')
         st.markdown('<div class="floating-btn">', unsafe_allow_html=True)
         if st.button("⬅️ Back to Main Page", key="float_back"):
+            print('⬅️ Back to Main Page button press ☑️')
             st.session_state['page_status'] = 'home'
+            print(f"Page Status : {st.session_state['page_status']}")
             st.switch_page("finance_app_main.py")
         st.markdown('</div>', unsafe_allow_html=True)
 
 if 'page_status' not in st.session_state:
     st.session_state['page_status'] = 'home'
+    print('Page status updated to home')
+    print('Switching ➡️  🏠️ Page')
     st.switch_page('pages/home.py')
 
 if st.session_state['page_status'] == 'login':
+    print('Page Status : login')
     st.session_state['key_file_data'] = aut.load_key_file_data()
     status = run() 
     print(f"page state : {st.session_state['page_status']}")
     if status == 'welcome':
+        print('Switching ➡️  Welcome 👋 Page')
         st.switch_page('pages/welcome.py')

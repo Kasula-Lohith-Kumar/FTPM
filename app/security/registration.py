@@ -11,21 +11,26 @@ EXPECTED_HEADERS = ['Full_Name', 'Email', 'User_Name', 'Password']
 def registration_form():
     """Displays the registration form."""
 
+    print("In function : registration_form")
     registration_details = {'Status' : False}
     st.subheader("New User Registration")
 
     with st.form("registration_form"):
         full_name = st.text_input("Full Name *", max_chars=50)
         registration_details['Full_Name'] = full_name
+        print(f"full_name : {registration_details['Full_Name']}")
 
         email = st.text_input("Email Address *", help="Used for important updates.")
         email_status = authentication.validate_email_format(email)
+        print(f"email_status : {email_status}")
         registration_details['Email'] = email
+        print(f"email : {registration_details['Email']}")
 
         st.markdown("---")
 
         username = st.text_input("Username (Login ID) *", max_chars=30)
         registration_details['User_Name'] = username
+        print(f"username : {registration_details['User_Name']}")
         # Use type="password" to hide the input
         
         # FIX: Removed the invalid 'min_chars' argument
@@ -37,22 +42,28 @@ def registration_form():
         submitted = st.form_submit_button("Register")
         
         if submitted:
+            print('Button Press : Register')
             # --- Custom Validation Logic ---
             if len(password) < 6 or len(password) > 15:
                 st.error("Password must be 6 to 15 characters long.")
+                print('❌ Password must be 6 to 15 characters long.')
             elif password != confirm_password:
                 st.error("Passwords do not match.")
+                print('❌ Passwords do not match.')
             elif not full_name or not email or not username or not password or not confirm_password:
                 st.error("Please fill in all required fields (*).")
+                print('❌ Please fill in all required fields (*).')
             elif not email_status:
+                print('❌ Please provide the valid email id.')
                 st.error("Please provide the valid email id.")
             else:
                 registration_details['Password'] = confirm_password
-                print(f"key file data: {st.session_state['key_file_data']}")
-                print(gsc.SPREADSHEET_ID)
+                if st.session_state['key_file_data'] and gsc.SPREADSHEET_ID:
+                    print('Key is Active ✅')
                 sheet = gso.connect_to_worksheet(gsc.SPREADSHEET_ID,  st.session_state['key_file_data'])         
 
                 if sheet:
+                    print('Connected to Sheet ✅')
                     # Data to append (make sure the order matches your Sheet columns)
                     user_data = [
                         registration_details['Full_Name'],
@@ -66,6 +77,7 @@ def registration_form():
                     try:
                         # Append the new row to the sheet, gspread automatically increments the row
                         if (result['is_email_duplicate'] == False) and (result['is_username_duplicate'] == False):
+                            print('User E-Mail and Username uniqueness check Passed ✅')
                             if not check_reg_cols(sheet):
                                 write_headers_to_worksheet(sheet, REG_COL_RANGE)
                             
@@ -73,11 +85,14 @@ def registration_form():
                             st.success(f"✅ Registration successful for '{username}'!")
                             registration_details['Status'] = True
                         else:
+                            print("❌ Registration Filed for '{username}', user-name or e-mail already exists")
                             st.error(f"❌ Registration Filed for '{username}', user-name or e-mail already exists")
                     except Exception as e:
+                        print("❌ Failed to save data to Google Sheet. Error: {e}")
                         st.error(f"Failed to save data to Google Sheet. Error: {e}")
                         registration_details['Status'] = False # Ensure status is False on DB failure
                 else:
+                    print("❌ Could not proceed with registration due to a connection error.")
                     st.error("Could not proceed with registration due to a connection error.")
                     registration_details['Status'] = False
 
@@ -105,12 +120,14 @@ def check_reg_cols(worksheet) -> bool:
     # We only need the first element (the row itself)
     try:
         header_row = worksheet.get_values('A1:D1')
+        print('Headers already present ✅')
     except gspread.exceptions.APIError as e:
-        print(f"Error fetching header row: {e}")
+        print(f"❌ Error fetching header row: {e}")
         return False
     
     # Check if data was returned and if the list is not empty
     if not header_row or not header_row[0]:
+        print("❌ Headers doesn't exist")
         return False
     
     # 3. Compare the fetched header row (header_row[0]) with the expected list
@@ -133,7 +150,7 @@ def write_headers_to_worksheet(
     Returns:
         dict: The API response dictionary, or an empty dictionary on failure.
     """
-    
+    print('Writing Headers ...')
     try:
         # Data must be a list of lists, so we wrap the headers list
         data_to_write = [headers]

@@ -171,6 +171,7 @@ def load_key_file_data():
     
 def is_streamlit_cloud() -> bool:
     """Detect Streamlit Cloud by checking if st.secrets has Streamlit-managed credentials."""
+    print('GCP Service Account Check ...')
     try:
         _ = st.secrets["gcp_service_account"]
         return True
