@@ -95,5 +95,6 @@ if 'page_status' not in st.session_state:
 
 if st.session_state['page_status'] == 'login':
     status = run()
+    print(f"page state : {st.session_state['page_status']}")
     if status == 'welcome':
         st.switch_page('pages/welcome.py')

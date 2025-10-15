@@ -19,8 +19,8 @@ def connect_to_worksheet(
         key_file_data):
     try:
         created_tab = create_new_worksheet_tab(
-            gsc.KEY_FILE_DATA,
-            spreadsheet_id=gsc.SPREADSHEET_ID,
+            key_file_data,
+            spreadsheet_id=spreadsheet_id,
             new_worksheet_name=gsc.USERS_TAB_NAME
         )
         print(f'Created Tab : {created_tab}', type(created_tab))
@@ -38,6 +38,7 @@ def connect_to_worksheet(
 
 def authenticate(key_file_data):
     # 1. Authenticate the Service Account
+    print(f'In Authentication: {key_file_data}')
     credentials = Credentials.from_service_account_info(key_file_data, scopes=gsc.SCOPES)
     gc: Client = gspread.authorize(credentials)
     return gc

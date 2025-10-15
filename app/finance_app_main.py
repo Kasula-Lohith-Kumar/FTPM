@@ -60,6 +60,7 @@ def  run():
 
 if __name__ == "__main__":
 
-    gsc.KEY_FILE_DATA = load_key_file_data()
+    # gsc.KEY_FILE_DATA = load_key_file_data()
+    st.session_state['key_file_data'] = load_key_file_data()
 
     run()

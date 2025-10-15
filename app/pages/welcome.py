@@ -1,25 +1,50 @@
 import streamlit as st
 
-# Hides the default sidebar
-st.markdown("""
-    <style>
-        [data-testid="stSidebarNav"] {display: none;}
-        section[data-testid="stSidebar"] {display: none;}
-        [data-testid="collapsedControl"] {display: none;}
-    </style>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-    <style>
-        .block-container {
-            padding-left: 3rem;
-            padding-right: 2rem;
-            padding-top: 1rem;
-        }
-    </style>
-""", unsafe_allow_html=True)
 
 def run():
+    # 🔹 CSS Reset (important)
+    st.markdown("""
+        <style>
+            /* Reset all inherited styles from previous page */
+            html, body, [class*="block-container"] {
+                all: unset;
+                font-family: "Source Sans Pro", sans-serif;
+                font-size: 16px !important;
+                line-height: 1.4;
+                color: white;
+            }
+
+            /* Restore Streamlit layout defaults */
+            .block-container {
+                padding-left: 3rem !important;
+                padding-right: 2rem !important;
+                padding-top: 1rem !important;
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+            }
+
+            p {
+                font-size: 16px;
+                margin-bottom: 0.5rem;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # --- HIDE SIDEBAR + DEFAULT STREAMLIT ELEMENTS ---
+    st.markdown("""
+    <style>
+        [data-testid="stSidebarNav"],
+        section[data-testid="stSidebar"],
+        [data-testid="collapsedControl"] {
+            display: none !important;
+        }
+        #MainMenu, footer, header {visibility: hidden;}
+    </style>
+    """, unsafe_allow_html=True)
+
     # Set a default username for testing if not set
     if 'username' not in st.session_state:
         st.session_state.username = 'Lohith'
@@ -44,7 +69,7 @@ def run():
         text-align: center;
         box-shadow: 0px 2px 8px rgba(255,255,255,0.05);
         transition: all 0.3s ease;
-        height: 265px;
+        height: 180px;
     }
     .feature-card:hover {
         transform: translateY(-5px);
@@ -116,6 +141,7 @@ def run():
         elif st.session_state.selected_option == "Financial Literacy":
             st.markdown('<div style="background-color: #262730; padding: 10px 15px; border-radius: 8px; border-left: 5px solid #007bff;"><span style="color: #6c757d;">🧭 Opening Financial Learning Resources...</span></div>', unsafe_allow_html=True)
             st.session_state['focus_area'] = 'literacy'
+            st.session_state['page_status'] = 'financial_literacy'
             st.switch_page("pages/financial_literacy.py")
 
         elif st.session_state.selected_option == "Portfolio Tracking":
@@ -143,5 +169,5 @@ if 'username' not in st.session_state:
     st.session_state['username'] = None 
 
 if st.session_state['page_status'] == 'welcome':
-    print(st.session_state)
+    print(f"page state : {st.session_state['page_status']}")
     run()

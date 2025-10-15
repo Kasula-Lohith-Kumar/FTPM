@@ -8,12 +8,25 @@ def show_home_content():
     # page.app()
 
     # Hides the default sidebar
+    # st.markdown("""
+    # <style>
+    #     [data-testid="stSidebarNav"] {display: none;}
+    #     section[data-testid="stSidebar"] {display: none;}
+    #     [data-testid="collapsedControl"] {display: none;}
+    # </style>
+    # """, unsafe_allow_html=True)
+    # --- Hide sidebar and adjust layout ---
     st.markdown("""
-    <style>
-        [data-testid="stSidebarNav"] {display: none;}
-        section[data-testid="stSidebar"] {display: none;}
-        [data-testid="collapsedControl"] {display: none;}
-    </style>
+        <style>
+            [data-testid="stSidebarNav"] {display: none;}
+            section[data-testid="stSidebar"] {display: none;}
+            [data-testid="collapsedControl"] {display: none;}
+            .block-container {
+                padding-left: 6rem;
+                padding-right: 2rem;
+                padding-top: 1rem;
+            }
+        </style>
     """, unsafe_allow_html=True)
 
     st.markdown("""

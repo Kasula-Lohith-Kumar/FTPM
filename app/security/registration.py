@@ -48,7 +48,9 @@ def registration_form():
                 st.error("Please provide the valid email id.")
             else:
                 registration_details['Password'] = confirm_password
-                sheet = gso.connect_to_worksheet(gsc.SPREADSHEET_ID,  gsc.KEY_FILE_DATA)         
+                print(f"key file data: {st.session_state['key_file_data']}")
+                print(gsc.SPREADSHEET_ID)
+                sheet = gso.connect_to_worksheet(gsc.SPREADSHEET_ID,  st.session_state['key_file_data'])         
 
                 if sheet:
                     # Data to append (make sure the order matches your Sheet columns)
