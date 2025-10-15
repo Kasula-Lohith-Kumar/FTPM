@@ -2,6 +2,8 @@ import streamlit as st
 from security import registration as reg
 from security import authentication as aut
 from pages import home
+from google_sheets import gsheets_operations as gso
+from google_sheets import gsheets_config as gsc
 
 # Hides the default sidebar
 st.markdown("""
@@ -107,6 +109,16 @@ if 'page_status' not in st.session_state:
 if st.session_state['page_status'] == 'login':
     print('Page Status : login')
     st.session_state['key_file_data'] = aut.load_key_file_data()
+    sheet = gso.connect_to_worksheet(gsc.SPREADSHEET_ID,  st.session_state['key_file_data'])
+    if sheet:
+        st.session_state['work_sheet'] = sheet
+        print('Connected to Sheet ✅')
+        st.session_state['topic_cache_data'] = sheet.acell('K2').value
+        if st.session_state['topic_cache_data'] is None:
+            st.session_state['topic_cache_data'] = {}
+    else:
+        print("❌ Could not proceed with registration due to a connection error.")
+
     status = run() 
     print(f"page state : {st.session_state['page_status']}")
     if status == 'welcome':

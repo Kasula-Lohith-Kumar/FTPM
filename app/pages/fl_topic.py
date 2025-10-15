@@ -4,6 +4,8 @@ from streamlit_mic_recorder import mic_recorder
 import io
 from openai import OpenAI
 from pages import fl_config
+from app import openai_api_prompts as oap
+import json
 
 
 def run():
@@ -119,7 +121,19 @@ def run():
 
     # --- Learning material section ---
     st.markdown(f"### 📖 {t['learning_material']}")
-    st.info(f"**{topic_title}:** " + t["topic_intro"])
+    # st.info(f"**{topic_title}:** " + t["topic_intro"])
+    topic_value = st.session_state['topic_cache_data'].get(topic_title, None)
+    # topic_value =  None
+    if topic_value is None:
+        content = oap.learning_material()
+        if content:
+            st.write(content)
+            st.session_state['topic_cache_data'][topic_title] = content
+    else:
+        print('Retriving content from cache')
+        st.write(topic_value)
+    topic_data = json.dumps(st.session_state['topic_cache_data'])
+    st.session_state['work_sheet'].update_acell('K2', topic_data)
 
     col1, col2 = st.columns([1, 1])
     with col1:
