@@ -1,21 +1,6 @@
 import streamlit as st
 
 def show_home_content():
-    # st.sidebar.title('Navigation')
-    # selection = st.sidebar.radio("Go to", list(PAGES.keys()))
-    #
-    # page = PAGES[selection]
-    # page.app()
-
-    # Hides the default sidebar
-    # st.markdown("""
-    # <style>
-    #     [data-testid="stSidebarNav"] {display: none;}
-    #     section[data-testid="stSidebar"] {display: none;}
-    #     [data-testid="collapsedControl"] {display: none;}
-    # </style>
-    # """, unsafe_allow_html=True)
-    # --- Hide sidebar and adjust layout ---
     st.markdown("""
         <style>
             [data-testid="stSidebarNav"] {display: none;}
@@ -68,8 +53,6 @@ def show_home_content():
     if st.button("Launch Your Portfolio Dashboard 🚀", use_container_width=True):
         st.session_state['page_status'] = 'login'
         st.switch_page("pages/login.py")
-    # st.button("Launch Your Portfolio Dashboard 🚀", use_container_width=True)
-    # The sidebar navigation should link to key pages here as well.
 
 
 if st.session_state['page_status'] == 'home':

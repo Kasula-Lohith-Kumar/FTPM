@@ -91,10 +91,11 @@ def run():
 
 if 'page_status' not in st.session_state:
     st.session_state['page_status'] = 'home'
-    home.show_home_content()
+    st.switch_page('pages/home.py')
 
 if st.session_state['page_status'] == 'login':
-    status = run()
+    st.session_state['key_file_data'] = aut.load_key_file_data()
+    status = run() 
     print(f"page state : {st.session_state['page_status']}")
     if status == 'welcome':
         st.switch_page('pages/welcome.py')
