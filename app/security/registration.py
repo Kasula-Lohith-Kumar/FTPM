@@ -60,7 +60,7 @@ def registration_form():
                 registration_details['Password'] = confirm_password
                 if st.session_state['key_file_data'] and gsc.SPREADSHEET_ID:
                     print('Key is Active ✅')
-                sheet = gso.connect_to_worksheet(gsc.SPREADSHEET_ID,  st.session_state['key_file_data'])         
+                sheet = gso.connect_to_worksheet(gsc.SPREADSHEET_ID,  st.session_state['key_file_data'], gsc.USERS_TAB_NAME)         
 
                 if sheet:
                     print('Connected to Sheet ✅')

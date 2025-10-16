@@ -8,7 +8,7 @@ import pandas as pd
 if __name__ == '__main__':
     # Run the function
 
-    worksheet = gso.connect_to_worksheet(gsc.SPREADSHEET_ID,  gsc.KEY_FILE_LOCATION)
+    worksheet = gso.connect_to_worksheet(gsc.SPREADSHEET_ID,  gsc.KEY_FILE_LOCATION, gsc.USERS_TAB_NAME)
 
     if worksheet:
     #

@@ -6,6 +6,7 @@ from openai import OpenAI
 from pages import fl_config
 from app import openai_api_prompts as oap
 import json
+from google_sheets.gsheets_operations import get_mappings
 
 
 def run():
@@ -114,6 +115,8 @@ def run():
         )
         st.rerun()
 
+    # mapping = {"Introduction to Finance": "A1", "ఆర్థికానికి పరిచయం": "B1", ...}
+
     # --- Reload translation variables ---
     lang = st.session_state.language
     t = fl_config.translations[lang]
@@ -121,26 +124,65 @@ def run():
 
     # --- Learning material section ---
     st.markdown(f"### 📖 {t['learning_material']}")
-    # st.info(f"**{topic_title}:** " + t["topic_intro"])
-    topic_value = st.session_state['topic_cache_data'].get(topic_title, None)
-    # topic_value =  None
-    if topic_value is None:
-        content = oap.learning_material()
-        if content:
-            st.write(content)
-            st.session_state['topic_cache_data'][topic_title] = content
-    else:
-        print('Retriving content from cache')
-        st.write(topic_value)
-    topic_data = json.dumps(st.session_state['topic_cache_data'])
-    st.session_state['work_sheet'].update_acell('K2', topic_data)
 
-    col1, col2 = st.columns([1, 1])
-    with col1:
-        if st.button(t["speak_button"], key="speaker_button"):
-            speak_text(f"{topic_title}. " + t["topic_intro"], st.session_state.language)
-    with col2:
-        st.write("")
+    # Get Google Sheets worksheet object
+    sheet = st.session_state['topics_sheet']
+
+    # Get the cell based on the topic (from mapping)
+    cell = get_mappings().get(topic_title)
+
+    if not cell:
+        st.error("⚠️ No mapping found for this topic.")
+    else:
+        # --- Try to retrieve from cache or Google Sheets ---
+        topic_cache = st.session_state.get('topic_cache_data', {})
+        topic_value = topic_cache.get(topic_title)
+
+        # --- Layout for buttons ---
+        col1, col2 = st.columns([1, 1])
+
+        with col1:
+            if st.button(t["speak_button"], key="speaker_button"):
+                speak_text(f"{topic_title}. " + t["topic_intro"], st.session_state.language)
+
+        with col2:
+            # 🔄 Refresh button: clear cache and regenerate only for this topic
+            if st.button("♻️ New Response", key="refresh_button"):
+                st.session_state['topic_cache_data'].pop(topic_title, None)
+                st.info("🔄 Regenerating lesson content... please wait.")
+                try:
+                    new_content = oap.learning_material()
+                    if new_content:
+                        st.session_state['topic_cache_data'][topic_title] = new_content
+                        sheet.update_acell(cell, new_content)
+                        st.success("✅ Lesson updated successfully!")
+                        st.rerun()  # refresh Streamlit UI
+                except Exception as e:
+                    st.error(f"❌ Error while regenerating content: {e}")
+
+        # --- Retrieve content (cached, sheet, or new) ---
+        if topic_value is None:
+            try:
+                sheet_value = sheet.acell(cell).value
+            except Exception:
+                sheet_value = None
+
+            if sheet_value:
+                print(f"✅ Retrieved content for '{topic_title}' from Google Sheets.")
+                st.write(sheet_value)
+                topic_cache[topic_title] = sheet_value
+            else:
+                content = oap.learning_material()
+                if content:
+                    st.write(content)
+                    topic_cache[topic_title] = content
+                    sheet.update_acell(cell, content)
+        else:
+            print(f"♻️ Retrieved '{topic_title}' content from local cache.")
+            st.write(topic_value)
+
+        # --- Update cache in session ---
+        st.session_state['topic_cache_data'] = topic_cache
 
     # --- Quiz section ---
     st.write("---")

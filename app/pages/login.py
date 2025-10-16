@@ -108,19 +108,44 @@ if 'page_status' not in st.session_state:
 
 if st.session_state['page_status'] == 'login':
     print('Page Status : login')
-    st.session_state['key_file_data'] = aut.load_key_file_data()
-    sheet = gso.connect_to_worksheet(gsc.SPREADSHEET_ID,  st.session_state['key_file_data'])
-    if sheet:
-        st.session_state['work_sheet'] = sheet
-        print('Connected to Sheet ✅')
-        st.session_state['topic_cache_data'] = sheet.acell('K2').value
-        if st.session_state['topic_cache_data'] is None:
-            st.session_state['topic_cache_data'] = {}
-    else:
-        print("❌ Could not proceed with registration due to a connection error.")
 
-    status = run() 
+    # --- Load credentials ---
+    st.session_state['key_file_data'] = aut.load_key_file_data()
+
+    # --- Connect to Google Sheet ---
+    topics_sheet = gso.connect_to_worksheet(
+        gsc.SPREADSHEET_ID,
+        st.session_state['key_file_data'],
+        gsc.TOPICS_TAB
+    )
+
+    if topics_sheet:
+        st.session_state['topics_sheet'] = topics_sheet
+        print('✅ Connected to Google Sheet successfully.')
+
+        # --- Initialize topic cache ---
+        if 'topic_cache_data' not in st.session_state:
+            st.session_state['topic_cache_data'] = {}
+
+        # --- Preload topic data from Google Sheet ---
+        # You can adjust columns depending on how many languages you have
+        # A-E covers English, Telugu, Hindi, Tamil, Kannada (A1:E45)
+        all_values = topics_sheet.get('A1:E45')  # returns a list of lists
+
+        # Flatten all cells into cache
+        for row in all_values:
+            for cell_value in row:
+                if cell_value and len(cell_value.strip()) > 0:
+                    st.session_state['topic_cache_data'][cell_value] = cell_value
+
+        print(f"📚 Preloaded {len(st.session_state['topic_cache_data'])} topic entries from Google Sheet.")
+
+    else:
+        print("❌ Could not connect to Google Sheet.")
+
+    # --- Continue app flow ---
+    status = run()
     print(f"page state : {st.session_state['page_status']}")
     if status == 'welcome':
-        print('Switching ➡️  Welcome 👋 Page')
+        print('➡️ Switching to Welcome Page 👋')
         st.switch_page('pages/welcome.py')

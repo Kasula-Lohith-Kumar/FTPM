@@ -4,6 +4,7 @@ import gspread
 from google_sheets import gsheets_config as gsc
 from google.oauth2.service_account import Credentials
 from gspread import Client, Spreadsheet
+from pages import fl_config
 
 
 
@@ -16,12 +17,12 @@ def get_worksheet(key_file_data, spreadsheet_id, created_tab):
 
 def connect_to_worksheet(
         spreadsheet_id: str,
-        key_file_data):
+        key_file_data, tab_name):
     try:
         created_tab = create_new_worksheet_tab(
             key_file_data,
             spreadsheet_id=spreadsheet_id,
-            new_worksheet_name=gsc.USERS_TAB_NAME
+            new_worksheet_name=tab_name
         )
         print(f'Created Tab : {created_tab}', type(created_tab))
 
@@ -166,3 +167,30 @@ def open_gsheet(spreadsheet_id: str,
     spreadsheet = gc.open_by_key(spreadsheet_id)
 
     return spreadsheet
+
+
+def get_mappings():
+
+    mapping = {}
+
+    # English topics → Column A
+    for i, sub in enumerate(sum(fl_config.topics.values(), []), start=1):
+        mapping[sub] = f"A{i}"
+
+    # Telugu topics → Column B
+    for i, sub in enumerate(sum(fl_config.topics_telugu.values(), []), start=1):
+        mapping[sub] = f"B{i}"
+
+    # Hindi topics → Column C
+    for i, sub in enumerate(sum(fl_config.topics_hindi.values(), []), start=1):
+        mapping[sub] = f"C{i}"
+
+    # Tamil topics → Column D
+    for i, sub in enumerate(sum(fl_config.topics_tamil.values(), []), start=1):
+        mapping[sub] = f"D{i}"
+
+    # Kannada topics → Column E
+    for i, sub in enumerate(sum(fl_config.topics_kannada.values(), []), start=1):
+        mapping[sub] = f"E{i}"
+
+    return mapping
