@@ -184,29 +184,217 @@ def run():
         # --- Update cache in session ---
         st.session_state['topic_cache_data'] = topic_cache
 
+    # --- Helper to normalize quiz data ---
+    def normalize_quiz_output(raw):
+        """Standardize quiz data to always return a list of question dicts."""
+        if raw is None:
+            return None
+        if isinstance(raw, list):
+            return raw
+        if isinstance(raw, dict):
+            for key in ("questions", "quiz", "items"):
+                if key in raw and isinstance(raw[key], list):
+                    return raw[key]
+            vals = [v for v in raw.values() if isinstance(v, dict) and "question" in v]
+            if vals:
+                return vals
+        return None
+    # --- Detect language change and regenerate quiz ---
+    last_lang = st.session_state.get("last_quiz_language")
+    if (
+        st.session_state.language and st.session_state.language != last_lang
+    ):
+        st.info(f"🌐 Language changed to **{st.session_state.language}** — regenerating quiz...")
+        try:
+            raw_quiz = oap.generate_quiz()
+            qs = normalize_quiz_output(raw_quiz)
+            if qs and len(qs) > 0:
+                st.session_state.quiz_questions = qs[:5]
+                st.session_state.quiz_answers = {}
+                st.session_state.quiz_feedback = {}
+                st.session_state.quiz_submitted = False
+                st.session_state.quiz_completed = False
+                st.session_state.last_quiz_language = st.session_state.language
+                st.rerun()
+            else:
+                st.warning("Could not regenerate quiz for the new language.")
+        except Exception as e:
+            st.error(f"Error regenerating quiz for new language: {e}")
+            
     # --- Quiz section ---
     st.write("---")
     st.subheader("🧠 " + t["take_quiz"])
 
-    if not st.session_state.quiz_completed:
-        quiz_question = f"Regarding **{topic_title}**, what is the main goal of finance?"
+    # ✅ Initialize session state variables once
+    st.session_state.setdefault("last_quiz_language", None)
+    st.session_state.setdefault("quiz_questions", None)
+    st.session_state.setdefault("quiz_answers", {})
+    st.session_state.setdefault("quiz_feedback", {})
+    st.session_state.setdefault("quiz_submitted", False)
+    st.session_state.setdefault("quiz_completed", False)
 
-        if st.button("🚀 Start Quiz"):
-            with st.expander("📋 Quiz", expanded=True):
-                answer = st.radio(
-                    quiz_question,
-                    ["A) Spending money", "B) Managing money efficiently", "C) Avoiding all investments"],
-                    key="quiz_radio",
-                )
-                if st.button("✅ Submit Quiz"):
-                    if answer == "B) Managing money efficiently":
-                        st.session_state.quiz_completed = True
-                        st.success(t["quiz_completed"])
-                        st.toast(t["quiz_completed"])
+
+        # Detect language change and regenerate quiz (only after normalize_quiz_output is defined)
+    if (
+        "language" in st.session_state
+        and st.session_state.language
+        and st.session_state.language != st.session_state.last_quiz_language
+    ):
+        st.info(f"🌐 Language changed to **{st.session_state.language}** — regenerating quiz...")
+        try:
+            raw_quiz = oap.generate_quiz()
+            qs = normalize_quiz_output(raw_quiz)
+            if qs and len(qs) > 0:
+                st.session_state.quiz_questions = qs[:5]
+                st.session_state.quiz_answers = {}
+                st.session_state.quiz_feedback = {}
+                st.session_state.quiz_submitted = False
+                st.session_state.quiz_completed = False
+                st.session_state.last_quiz_language = st.session_state.language
+                # rerun compat for old/new Streamlit
+                try:
+                    st.rerun()
+                except AttributeError:
+                    st.experimental_rerun()
+            else:
+                st.warning("Could not regenerate quiz for the new language.")
+        except Exception as e:
+            st.error(f"Error regenerating quiz for new language: {e}")
+
+    # Ensure these session_state keys exist
+    if "quiz_questions" not in st.session_state:
+        st.session_state.quiz_questions = None
+    if "quiz_answers" not in st.session_state:
+        st.session_state.quiz_answers = {}
+    if "quiz_feedback" not in st.session_state:
+        st.session_state.quiz_feedback = {}
+    if "quiz_submitted" not in st.session_state:
+        st.session_state.quiz_submitted = False
+    if "quiz_completed" not in st.session_state:
+        st.session_state.quiz_completed = False
+    if "last_quiz_language" not in st.session_state:
+        st.session_state.last_quiz_language = None
+
+
+    # When user clicks Start (or if we don't have questions yet) generate quiz questions
+    start_button = st.button("🚀 Start Quiz")
+    if start_button and not st.session_state.quiz_questions:
+        try:
+            raw_quiz = oap.generate_quiz()  # your existing function that returns 5 questions
+            qs = normalize_quiz_output(raw_quiz)
+            if not qs or len(qs) < 1:
+                st.error("Could not parse quiz questions from the generator. Please try again.")
+            else:
+                # Keep only first 5 questions (or exactly 5 if generator returns 5)
+                st.session_state.quiz_questions = qs[:5]
+                st.session_state.quiz_answers = {}
+                st.session_state.quiz_feedback = {}
+                st.session_state.quiz_submitted = False
+                st.session_state.quiz_completed = False
+                st.rerun()
+        except Exception as e:
+            st.error(f"Error generating quiz: {e}")
+
+    # If we already have quiz questions and quiz not completed, show them
+    if not st.session_state.quiz_completed:
+        if st.session_state.quiz_questions:
+            topic_title = st.session_state.selected_topic[0] if "selected_topic" in st.session_state else "Topic"
+            st.markdown(f"**Topic:** {topic_title}")
+
+            with st.form(key="quiz_form"):
+                # show all questions with radio buttons
+                for i, q in enumerate(st.session_state.quiz_questions):
+                    q_text = q.get("question") if isinstance(q, dict) else str(q)
+                    options = q.get("options") if isinstance(q, dict) else []
+                    answer_key = f"q{i}_radio"
+
+                    # If options exist, display as radio with index-prefixed labels preserved
+                    if options and isinstance(options, (list, tuple)):
+                        st.radio(f"Q{i+1}. {q_text}", options, key=answer_key)
                     else:
-                        st.error("❌ Try again.")
+                        # fallback: show a text input if options missing (shouldn't happen)
+                        st.text_input(f"Q{i+1}. {q_text} — (no options returned by generator)", key=answer_key)
+
+                submit_all = st.form_submit_button("✅ Submit All")
+
+                if submit_all:
+                    # Evaluate all answers
+                    any_wrong = False
+                    st.session_state.quiz_feedback = {}
+                    for i, q in enumerate(st.session_state.quiz_questions):
+                        options = q.get("options") if isinstance(q, dict) else []
+                        correct = q.get("answer") if isinstance(q, dict) else None
+                        user_sel = st.session_state.get(f"q{i}_radio")
+                        # Normalize comparisons: exact-match required per your earlier requirement.
+                        if user_sel is None:
+                            # No selection made
+                            st.session_state.quiz_feedback[i] = {
+                                "result": "no_answer",
+                                "message": "No answer selected."
+                            }
+                            any_wrong = True
+                        elif correct is None:
+                            st.session_state.quiz_feedback[i] = {
+                                "result": "unknown",
+                                "message": "Correct answer not available to evaluate."
+                            }
+                            any_wrong = True
+                        else:
+                            if user_sel == correct:
+                                st.session_state.quiz_feedback[i] = {
+                                    "result": "correct",
+                                    "message": "✔️ Correct"
+                                }
+                            else:
+                                st.session_state.quiz_feedback[i] = {
+                                    "result": "wrong",
+                                    "message": f"❌ Answer provided is wrong — correct answer: **{correct}**",
+                                    "your_answer": user_sel
+                                }
+                                any_wrong = True
+
+                    st.session_state.quiz_submitted = True
+                    # show feedback immediately below the form
+                    for i, q in enumerate(st.session_state.quiz_questions):
+                        fb = st.session_state.quiz_feedback.get(i, {})
+                        q_text = q.get("question") if isinstance(q, dict) else str(q)
+                        if fb.get("result") == "correct":
+                            st.success(f"Q{i+1}. {q_text} — {fb['message']}")
+                        elif fb.get("result") == "wrong":
+                            st.error(f"Q{i+1}. {q_text} — {fb['message']}")
+                        elif fb.get("result") == "no_answer":
+                            st.warning(f"Q{i+1}. {q_text} — {fb['message']}")
+                        else:
+                            st.info(f"Q{i+1}. {q_text} — {fb.get('message','Evaluated.')}")
+
+                    # After evaluating all, mark overall completion (you asked to set True later)
+                    st.session_state.quiz_completed = True
+                    # Optional UI acknowledgements
+                    st.success(t["quiz_completed"])
+                    try:
+                        st.toast(t["quiz_completed"])
+                    except Exception:
+                        pass  # st.toast may not be available in all Streamlit versions
+        else:
+            st.info("Click **Start Quiz** to generate 5 questions for this topic.")
     else:
+        # quiz already completed
         st.success(t["quiz_completed"])
+        # display feedback / stored answers if available
+        if st.session_state.get("quiz_feedback"):
+            st.write("### Your results")
+            for i, q in enumerate(st.session_state.quiz_questions or []):
+                fb = st.session_state.quiz_feedback.get(i, {})
+                q_text = q.get("question") if isinstance(q, dict) else str(q)
+                if fb.get("result") == "correct":
+                    st.success(f"Q{i+1}. {q_text} — ✔️ Correct")
+                elif fb.get("result") == "wrong":
+                    st.error(f"Q{i+1}. {q_text} — ❌ Wrong — correct answer: **{q.get('answer')}** — Your answer: {fb.get('your_answer')}")
+                elif fb.get("result") == "no_answer":
+                    st.warning(f"Q{i+1}. {q_text} — No answer selected.")
+                else:
+                    st.info(f"Q{i+1}. {q_text} — {fb.get('message','Evaluated.')}")
+
 
     # --- Chatbot section with mic & speaker in ribbon ---
     st.write("---")
@@ -261,6 +449,7 @@ def run():
         current_canon_name, current_topic_idx, _ = st.session_state.selected_topic
         if "completed_topics" in st.session_state:
             st.session_state.completed_topics[current_canon_name][current_topic_idx] = "Yes"
+            st.session_state['page_status'] = 'financial_literacy'
         st.toast("Topic completed! Proceeding to the next lesson.")
         st.switch_page("pages/financial_literacy.py")
 

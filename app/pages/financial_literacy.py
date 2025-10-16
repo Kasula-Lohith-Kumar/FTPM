@@ -264,4 +264,11 @@ if 'username' not in st.session_state:
 
 if st.session_state['page_status'] == 'financial_literacy':
     print(f"page state : {st.session_state['page_status']}")
+    st.session_state.quiz_answers = {}
+    st.session_state.quiz_feedback = {}
+    st.session_state.quiz_submitted = False
+    st.session_state.quiz_completed = False
+    st.session_state.last_quiz_language = None
+    # st.rerun()
+    print(st.session_state)
     run()
