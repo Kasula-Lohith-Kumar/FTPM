@@ -430,7 +430,7 @@ def run():
 
     # Process input or voice
     if mic_audio:
-        user_input = oap.audio_transctiption(st.audio(mic_audio["bytes"]))
+        user_input = oap.audio_transcription(st.audio_input("Speak something..."))
 
 
     if user_input:

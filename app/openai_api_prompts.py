@@ -100,7 +100,7 @@ def chat_bot():
     return reply
 
 
-def audio_transctiption(audio_bytes):
+def audio_transcription(audio_bytes):
 
     with open("temp.wav", "wb") as f:
         f.write(audio_bytes.getbuffer())
