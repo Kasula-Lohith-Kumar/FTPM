@@ -414,12 +414,13 @@ def run():
 
     with chat_col2:
         mic_audio = mic_recorder(
-            start_prompt="🎤",
-            stop_prompt="🛑",
-            just_once=True,
-            use_container_width=True,
-            key="chat_mic",
-        )
+        start_prompt="🎤 Start",
+        stop_prompt="🛑 Stop",
+        just_once=True,
+        use_container_width=True,
+        key="chat_mic",
+    )
+
 
     with chat_col3:
         if st.button("🔊", key="chat_speaker"):
@@ -431,9 +432,12 @@ def run():
     # Process input or voice
     if mic_audio:
         st.info("⏳ Transcribing...")
-        user_input = oap.audio_transcription(mic_audio)
-        st.success("✅ Sucesfully converted audio to text")
-        st.write(user_input)
+        try:
+            text = oap.audio_transcription(mic_audio)
+            st.success("✅ Transcribed Text:")
+            st.write(text)
+        except Exception as e:
+            st.error(f"❌ Transcription failed: {e}")
 
 
     if user_input:

@@ -100,26 +100,28 @@ def chat_bot():
     return reply
 
 
-def audio_transcription(audio_bytes):
-    # Determine byte source
-    if isinstance(audio_bytes, dict) and "bytes" in audio_bytes:
-        audio_data = audio_bytes["bytes"]
+def audio_transcription(mic_audio):
+    # Handle mic_recorder format
+    if isinstance(mic_audio, dict) and "bytes" in mic_audio:
+        raw_bytes = mic_audio["bytes"]
+        sample_rate = mic_audio.get("sample_rate", 44100)  # default if not provided
+
+        # Convert raw PCM bytes into a valid WAV file
+        wav_buffer = io.BytesIO()
+        with wave.open(wav_buffer, "wb") as wf:
+            wf.setnchannels(1)
+            wf.setsampwidth(2)  # 16-bit PCM
+            wf.setframerate(sample_rate)
+            wf.writeframes(raw_bytes)
+        wav_buffer.seek(0)
     else:
-        audio_data = audio_bytes.read()
+        # Fallback for st.audio_input
+        wav_buffer = mic_audio
 
-    # 🔍 Debug: check size
-    if not audio_data or len(audio_data) < 1000:
-        raise ValueError("Audio data is empty or too short")
-
-    # Write temp file
-    with open("temp.wav", "wb") as f:
-        f.write(audio_data)
-
-    # Transcribe
-    with open("temp.wav", "rb") as f:
-        transcription = client.audio.transcriptions.create(
-            model="gpt-4o-mini-transcribe",
-            file=f
-        )
+    # --- Send to OpenAI ---
+    transcription = client.audio.transcriptions.create(
+        model="gpt-4o-mini-transcribe",
+        file=wav_buffer
+    )
 
     return transcription.text
