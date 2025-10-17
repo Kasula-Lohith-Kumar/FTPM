@@ -101,14 +101,22 @@ def chat_bot():
 
 
 def audio_transcription(audio_bytes):
+    # ✅ If coming from mic_recorder, it's already raw bytes
+    if isinstance(audio_bytes, dict) and "bytes" in audio_bytes:
+        audio_data = audio_bytes["bytes"]
+    else:
+        # If called with Streamlit UploadedFile, use .read()
+        audio_data = audio_bytes.read()
 
+    # Save to temp file
     with open("temp.wav", "wb") as f:
-        f.write(audio_bytes.read())
+        f.write(audio_data)
 
+    # Send to OpenAI
     with open("temp.wav", "rb") as audio_file:
         transcription = client.audio.transcriptions.create(
             model="gpt-4o-mini-transcribe",
             file=audio_file
         )
 
-        return transcription.text
+    return transcription.text
