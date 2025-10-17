@@ -119,6 +119,8 @@ if st.session_state['page_status'] == 'login':
         gsc.TOPICS_TAB
     )
 
+    st.session_state['buffer'] = []
+
     if topics_sheet:
         st.session_state['topics_sheet'] = topics_sheet
         print('✅ Connected to Google Sheet successfully.')

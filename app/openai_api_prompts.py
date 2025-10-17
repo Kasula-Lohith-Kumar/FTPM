@@ -6,6 +6,9 @@ import json
 
 client = OpenAI(api_key=app_config.key)
 
+if "buffer" not in st.session_state:
+    st.session_state.buffer = []
+
 def learning_material():
 
     response = client.responses.create(model = 'gpt-4.1-mini', input=f"You are a financal guide/teacher \
@@ -76,3 +79,21 @@ def generate_quiz():
         quiz_data = eval(clean_content)
 
     return quiz_data
+
+def add_to_buffer(role, content):
+    st.session_state.buffer.append({"role": role, "content": content})
+    if len(st.session_state.buffer) > 10:
+        st.session_state.buffer = st.session_state.buffer[-10:]
+
+
+def chat_bot():
+    response = client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=[{"role": "system", "content": "You are a helpful assistant who is expert in finance and you help "
+            "the user by clarifying their doubt, politely ignore if the topic is not related to finance something like "
+            "'please on our current leaning' like that."}, 
+            *st.session_state.buffer],
+    )
+    reply = response.choices[0].message.content
+    add_to_buffer("assistant", reply)
+    return reply

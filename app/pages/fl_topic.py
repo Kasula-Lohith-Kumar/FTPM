@@ -409,7 +409,8 @@ def run():
     chat_col1, chat_col2, chat_col3 = st.columns([8, 1, 1])
 
     with chat_col1:
-        user_input = st.chat_input("Ask your question...")
+        user_input = st.chat_input("💬 ChatBot with 5-Messages Memory, Ask your question ...")
+
 
     with chat_col2:
         mic_audio = mic_recorder(
@@ -433,10 +434,15 @@ def run():
         st.success("🎙️ Voice captured successfully! (Transcription logic goes here)")
 
     if user_input:
-        st.session_state.messages.append({"role": "user", "content": user_input})
-        reply = f"That's an insightful question about {topic_title}! Here is a short dummy reply."
-        st.session_state.messages.append({"role": "assistant", "content": reply})
-        st.rerun()
+        oap.add_to_buffer("user", user_input)
+        # Display chat history
+        for msg in st.session_state.buffer:
+            with st.chat_message(msg["role"]):
+                # st.markdown(msg["content"])
+                reply = oap.chat_bot()
+                st.session_state.messages.append({"role": "user", "content": user_input})
+                st.session_state.messages.append({"role": "assistant", "content": reply})
+                st.rerun()
 
     # --- Navigation buttons ---
     st.write("---")
