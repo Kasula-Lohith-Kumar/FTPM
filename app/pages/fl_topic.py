@@ -120,6 +120,7 @@ def run():
     # --- Reload translation variables ---
     lang = st.session_state.language
     t = fl_config.translations[lang]
+    print(f"***** *   **8******{t}")
     chapter_name, topic_index, topic_title = st.session_state.selected_topic
 
     # --- Learning material section ---
@@ -278,7 +279,7 @@ def run():
 
 
     # When user clicks Start (or if we don't have questions yet) generate quiz questions
-    start_button = st.button("🚀 Start Quiz")
+    start_button = st.button(t.get('start_quiz', '🚀 Start Quiz'))
     if start_button and not st.session_state.quiz_questions:
         try:
             raw_quiz = oap.generate_quiz()  # your existing function that returns 5 questions
@@ -316,7 +317,7 @@ def run():
                         # fallback: show a text input if options missing (shouldn't happen)
                         st.text_input(f"Q{i+1}. {q_text} — (no options returned by generator)", key=answer_key)
 
-                submit_all = st.form_submit_button("✅ Submit All")
+                submit_all = st.form_submit_button(t.get('submit_all', '✅ Submit All'))
 
                 if submit_all:
                     # Evaluate all answers
@@ -411,7 +412,7 @@ def run():
     # chat_col1, chat_col2, chat_col3 = st.columns([8, 1, 1])
 
     with chat_col1:
-        user_input = st.chat_input("💬 ChatBot with 5-Messages Memory, Ask your question ...")
+        user_input = st.chat_input(t.get("chatbot_input", "💬 ChatBot with 5 Messages Memory, Ask your question..."))
 
 
     # with chat_col2:
