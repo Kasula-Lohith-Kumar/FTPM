@@ -103,7 +103,7 @@ def chat_bot():
 def audio_transcription(audio_bytes):
 
     with open("temp.wav", "wb") as f:
-        f.write(audio_bytes.getbuffer())
+        f.write(audio_bytes.read())
 
     with open("temp.wav", "rb") as audio_file:
         transcription = client.audio.transcriptions.create(
