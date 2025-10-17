@@ -45,6 +45,42 @@ def run():
     </style>
     """, unsafe_allow_html=True)
 
+    # --- CUSTOM BUTTON STYLING ---
+    st.markdown("""
+    <style>
+        /* Style all primary Streamlit buttons */
+        div.stButton > button {
+            background-color: #1f2937;  /* dark gray */
+            color: white;
+            border: 1px solid #374151
+            border-radius: 10px;
+            padding: 14px 99px; /* Button size */
+            font-size: 18px;     /* Text size */
+            font-weight: 600;
+            margin-bottom: 12px;
+            width: 100%;         /* Make full width of column */
+            transition: all 0.3s ease;
+        }
+
+        /* Hover effect */
+        div.stButton > button:hover {
+            background-color: #2563eb; /* Blue hover */
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+        }
+
+        /* Optional: Logout button distinct style */
+        [key="float_back"] button {
+            background-color: #b91c1c !important;
+            color: white !important;
+            font-size: 16px !important;
+            padding: 10px 20px !important;
+            width: auto !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
     # Set a default username for testing if not set
     if 'username' not in st.session_state:
         st.session_state.username = 'Lohith'
