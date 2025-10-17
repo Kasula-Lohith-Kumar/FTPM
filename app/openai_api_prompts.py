@@ -4,6 +4,7 @@ import streamlit as st
 import re
 import json
 import tempfile
+import os
 
 client = OpenAI(api_key=app_config.key)
 
@@ -102,10 +103,19 @@ def chat_bot():
 
 
 def audio_transcription(audio_file):
-    # Save uploaded or recorded file temporarily
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_file:
+    # Validate file
+    if audio_file is None or audio_file.size == 0:
+        raise ValueError("Empty or invalid audio input")
+
+    # Save the uploaded/recorded audio temporarily
+    file_ext = os.path.splitext(audio_file.name)[-1] or ".webm"
+    with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as temp_file:
         temp_file.write(audio_file.read())
         temp_path = temp_file.name
+
+    # Ensure file is readable
+    if os.path.getsize(temp_path) == 0:
+        raise ValueError("Recorded file is empty")
 
     # Send to OpenAI for transcription
     with open(temp_path, "rb") as f:
@@ -114,4 +124,6 @@ def audio_transcription(audio_file):
             file=f
         )
 
+    # Clean up temporary file
+    os.remove(temp_path)
     return transcription.text
