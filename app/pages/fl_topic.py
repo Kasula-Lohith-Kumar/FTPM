@@ -406,18 +406,19 @@ def run():
             st.write(msg["content"])
 
     # Input + mic + speaker ribbon
-    chat_col1, chat_col2, chat_col3 = st.columns([8, 1, 1])
+    chat_col1, chat_col2 = st.columns([8, 1])
+    # chat_col1, chat_col2, chat_col3 = st.columns([8, 1, 1])
 
     with chat_col1:
         user_input = st.chat_input("💬 ChatBot with 5-Messages Memory, Ask your question ...")
 
 
+    # with chat_col2:
+    #     st.write("Record your voice below:")
+    #     audio_input = st.audio_input("🎧 Record your voice")
+
+
     with chat_col2:
-        st.write("Record your voice below:")
-        audio_input = st.audio_input("🎧 Record your voice")
-
-
-    with chat_col3:
         if st.button("🔊", key="chat_speaker"):
             if st.session_state.messages:
                 speak_text(st.session_state.messages[-1]["content"], st.session_state.language)
@@ -425,14 +426,14 @@ def run():
                 st.warning("No response to speak yet.")
 
     # Process input or voice
-    if audio_input:
-        st.info("⏳ Transcribing...")
-        try:
-            text = oap.audio_transcription(audio_input)
-            st.success("✅ Transcribed Text:")
-            st.write(text)
-        except Exception as e:
-            st.error(f"❌ Transcription failed: {e}")
+    # if audio_input:
+    #     st.info("⏳ Transcribing...")
+    #     try:
+    #         text = oap.audio_transcription(audio_input)
+    #         st.success("✅ Transcribed Text:")
+    #         st.write(text)
+    #     except Exception as e:
+    #         st.error(f"❌ Transcription failed: {e}")
 
 
     if user_input:
