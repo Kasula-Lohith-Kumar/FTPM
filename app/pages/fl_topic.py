@@ -430,9 +430,8 @@ def run():
 
     # Process input or voice
     if mic_audio:
-      audio_input = user_input = st.audio_input("Speak something...")
-      if audio_input is not None:
-        user_input = oap.audio_transcription(audio_input)
+        st.info("⏳ Transcribing...")
+        user_input = oap.audio_transcription(mic_audio)
         st.success("✅ Sucesfully converted audio to text")
         st.write(user_input)
 
