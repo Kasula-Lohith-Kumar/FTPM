@@ -413,13 +413,8 @@ def run():
 
 
     with chat_col2:
-        mic_audio = mic_recorder(
-        start_prompt="🎤 Start",
-        stop_prompt="🛑 Stop",
-        just_once=True,
-        use_container_width=True,
-        key="chat_mic",
-    )
+        st.write("Record your voice below:")
+        audio_input = st.audio_input("🎧 Record your voice")
 
 
     with chat_col3:
@@ -430,10 +425,10 @@ def run():
                 st.warning("No response to speak yet.")
 
     # Process input or voice
-    if mic_audio:
+    if audio_input:
         st.info("⏳ Transcribing...")
         try:
-            text = oap.audio_transcription(mic_audio)
+            text = oap.audio_transcription(audio_input)
             st.success("✅ Transcribed Text:")
             st.write(text)
         except Exception as e:

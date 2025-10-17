@@ -3,6 +3,7 @@ from openai import OpenAI
 import streamlit as st
 import re
 import json
+import tempfile
 
 client = OpenAI(api_key=app_config.key)
 
@@ -100,28 +101,17 @@ def chat_bot():
     return reply
 
 
-def audio_transcription(mic_audio):
-    # Handle mic_recorder format
-    if isinstance(mic_audio, dict) and "bytes" in mic_audio:
-        raw_bytes = mic_audio["bytes"]
-        sample_rate = mic_audio.get("sample_rate", 44100)  # default if not provided
+def audio_transcription(audio_file):
+    # Save uploaded or recorded file temporarily
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_file:
+        temp_file.write(audio_file.read())
+        temp_path = temp_file.name
 
-        # Convert raw PCM bytes into a valid WAV file
-        wav_buffer = io.BytesIO()
-        with wave.open(wav_buffer, "wb") as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2)  # 16-bit PCM
-            wf.setframerate(sample_rate)
-            wf.writeframes(raw_bytes)
-        wav_buffer.seek(0)
-    else:
-        # Fallback for st.audio_input
-        wav_buffer = mic_audio
-
-    # --- Send to OpenAI ---
-    transcription = client.audio.transcriptions.create(
-        model="gpt-4o-mini-transcribe",
-        file=wav_buffer
-    )
+    # Send to OpenAI for transcription
+    with open(temp_path, "rb") as f:
+        transcription = client.audio.transcriptions.create(
+            model="gpt-4o-mini-transcribe",  # or "whisper-1"
+            file=f
+        )
 
     return transcription.text
