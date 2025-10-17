@@ -147,7 +147,8 @@ def run():
 
         with col2:
             # 🔄 Refresh button: clear cache and regenerate only for this topic
-            if st.button(t.get("new_response", "♻️ New Response"), key="refresh_button"):
+            button_name = t.get("new_response", "♻️ New Response")
+            if st.button(button_name, key="refresh_button"):
                 st.session_state['topic_cache_data'].pop(topic_title, None)
                 st.info("🔄 Regenerating lesson content... please wait.")
                 try:
