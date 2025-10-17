@@ -91,7 +91,8 @@ def chat_bot():
             model="gpt-4.1-mini",
             messages=[{"role": "system", "content": "You are a helpful assistant who is expert in finance and you help "
             "the user by clarifying their doubt, politely ignore if the topic is not related to finance something like "
-            "'please on our current leaning' like that."}, 
+            f"'please on our current leaning' like that. Reply only in {st.session_state.language} \
+            unless user ask you to give response in differnt language"}, 
             *st.session_state.buffer],
     )
     reply = response.choices[0].message.content
