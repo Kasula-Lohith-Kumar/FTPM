@@ -430,8 +430,8 @@ def run():
 
     # Process input or voice
     if mic_audio:
-        st.audio(mic_audio["bytes"])
-        st.success("🎙️ Voice captured successfully! (Transcription logic goes here)")
+        user_input = oap.audio_transctiption(st.audio(mic_audio["bytes"]))
+
 
     if user_input:
         oap.add_to_buffer("user", user_input)

@@ -98,3 +98,17 @@ def chat_bot():
     reply = response.choices[0].message.content
     add_to_buffer("assistant", reply)
     return reply
+
+
+def audio_transctiption(audio_bytes):
+
+    with open("temp.wav", "wb") as f:
+        f.write(audio_bytes.getbuffer())
+
+    with open("temp.wav", "rb") as audio_file:
+        transcription = client.audio.transcriptions.create(
+            model="gpt-4o-mini-transcribe",
+            file=audio_file
+        )
+
+        return transcription.text
