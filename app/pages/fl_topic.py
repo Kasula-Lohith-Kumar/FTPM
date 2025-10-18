@@ -29,8 +29,8 @@ def run():
     st.set_page_config(page_title="Finance Tutor", layout="wide")
 
     # --- Initialize session state variables ---
-    if "user_name" not in st.session_state:
-        st.session_state.user_name = "Lohith"
+    if "username" not in st.session_state:
+        st.session_state.username = "Lohith"
     if "selected_topic" not in st.session_state:
         st.session_state.selected_topic = ("Finance Fundamentals", 0, "Introduction to Finance")
     if "canon_topic_index" not in st.session_state:
