@@ -72,7 +72,7 @@ def run():
     st.markdown(
         f"""
         <div style="background-color:#0f1724; padding:18px; border-radius:10px; color:white;">
-            <h2>👋 {t['welcome']}, {st.session_state.user_name}!</h2>
+            <h2>👋 {t['welcome']}, {st.session_state.username}!</h2>
             <p>📘 {chapter_name} | 🧩 {topic_title}</p>
         </div>
         """,
