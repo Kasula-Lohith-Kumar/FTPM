@@ -35,6 +35,7 @@ def registration_form():
         
         # FIX: Removed the invalid 'min_chars' argument
         password = st.text_input("Password *", type="password", help="Min 6 and Max 15 Characters Long")
+        topic_status = {}
         # FIX: Removed the invalid 'min_chars' argument
         confirm_password = st.text_input("Confirm Password *", type="password")
 
@@ -69,7 +70,8 @@ def registration_form():
                         registration_details['Full_Name'],
                         registration_details['Email'],
                         registration_details['User_Name'],
-                        registration_details['Password']
+                        registration_details['Password'],
+                        topic_status
                         # You might want to store a timestamp here too
                     ]
                     result = authentication.check_for_duplicates(sheet, registration_details['Email'],
