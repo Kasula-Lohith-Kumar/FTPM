@@ -3,6 +3,7 @@ import gspread
 from google_sheets import gsheets_operations as gso
 from google_sheets import gsheets_config as gsc
 from security import authentication
+import json
 
 REG_COL_INDEX = 0
 REG_COL_RANGE = 'A1:D1'
@@ -35,7 +36,7 @@ def registration_form():
         
         # FIX: Removed the invalid 'min_chars' argument
         password = st.text_input("Password *", type="password", help="Min 6 and Max 15 Characters Long")
-        topic_status = {}
+        topic_status = json.dumps({})
         # FIX: Removed the invalid 'min_chars' argument
         confirm_password = st.text_input("Confirm Password *", type="password")
 
