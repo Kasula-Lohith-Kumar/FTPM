@@ -7,6 +7,7 @@ from pages import fl_config
 from app import openai_api_prompts as oap
 import json
 from google_sheets.gsheets_operations import get_mappings
+from google_sheets import gsheets_operations as gso
 
 
 def run():
@@ -461,6 +462,7 @@ def run():
         if "completed_topics" in st.session_state:
             st.session_state.completed_topics[current_canon_name][current_topic_idx] = "Yes"
             st.session_state['page_status'] = 'financial_literacy'
+            gso.write_to_cell(gso.get_topics_status_cell_id(st.session_state.username), st.session_state.completed_topics)
         st.toast("Topic completed! Proceeding to the next lesson.")
         st.switch_page("pages/financial_literacy.py")
 

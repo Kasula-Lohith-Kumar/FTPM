@@ -4,6 +4,7 @@ from security import authentication as aut
 from pages import home
 from google_sheets import gsheets_operations as gso
 from google_sheets import gsheets_config as gsc
+import json
 
 # Hides the default sidebar
 st.markdown("""
@@ -147,6 +148,8 @@ if st.session_state['page_status'] == 'login':
 
     # --- Continue app flow ---
     status = run()
+    if st.session_state.get('username', None)  != None:
+        st.session_state.completed_topics = json.loads(gso.get_user_data(st.session_state.get('username', None), gsc.USER_TOPICS_STATUS_COL_NAME))
     print(f"page state : {st.session_state['page_status']}")
     if status == 'welcome':
         print('➡️ Switching to Welcome Page 👋')

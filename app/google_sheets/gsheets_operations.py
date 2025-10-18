@@ -5,6 +5,8 @@ from google_sheets import gsheets_config as gsc
 from google.oauth2.service_account import Credentials
 from gspread import Client, Spreadsheet
 from pages import fl_config
+import streamlit as st
+import json
 
 
 
@@ -194,3 +196,50 @@ def get_mappings():
         mapping[sub] = f"E{i}"
 
     return mapping
+
+def get_user_data(username, col_name):
+    worksheet = get_worksheet(st.session_state['key_file_data'], gsc.SPREADSHEET_ID, gsc.USERS_TAB_NAME)
+    user_records = worksheet.get_all_records()
+
+    for record in user_records:
+        # gspread.get_all_records() uses the column headers as dictionary keys
+
+        # Find a matching username
+        if record.get('User_Name') == username:
+            # Username found! Now check the password
+
+            return record.get(col_name, None)
+
+    else:
+        # If the loop finishes without finding the username
+        print("❌ Unable to fetch {col_name} of {username}.")
+
+
+def get_topics_status_cell_id(username):
+    """
+    Returns the cell address (like 'E2') of 'Topics_Status'
+    for a given unique 'User_Name' in the Google Sheet.
+    """
+    # Get all data
+    sheet = get_worksheet(st.session_state['key_file_data'], gsc.SPREADSHEET_ID, gsc.USERS_TAB_NAME)
+    data = sheet.get_all_values()
+
+    # Extract headers
+    headers = data[0]
+    user_col_index = headers.index("User_Name")
+    topics_status_col_index = headers.index("Topics_Status")
+
+    # Loop through rows to find the user
+    for i, row in enumerate(data[1:], start=2):  # start=2 since header is row 1
+        if row[user_col_index] == username:
+            # Convert column index (0-based) to column letter
+            col_letter = gspread.utils.rowcol_to_a1(1, topics_status_col_index + 1)[0]
+            cell_address = f"{col_letter}{i}"
+            return cell_address
+
+    return None  # if username not found
+
+
+def write_to_cell(target_cell_id, new_value):
+    sheet = get_worksheet(st.session_state['key_file_data'], gsc.SPREADSHEET_ID, gsc.USERS_TAB_NAME)
+    return sheet.update_acell(target_cell_id, json.dumps(new_value))

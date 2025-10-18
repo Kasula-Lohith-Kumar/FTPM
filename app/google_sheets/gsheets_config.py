@@ -6,6 +6,8 @@ KEY_FILE_DATA = None
 WORKSHEET = None
 EMAIL_COL_INDEX = 2
 USER_NAME_COL_INDEX = 3
+USER_TOPICS_STATUS_COL_INDEX = 5
+USER_TOPICS_STATUS_COL_NAME = 'Topics_Status'
 
 SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets', # For Sheets API access

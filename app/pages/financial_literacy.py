@@ -1,6 +1,8 @@
 import streamlit as st
 from pages import fl_config
 from app import finance_app_main
+from google_sheets import gsheets_operations as gso
+
 
 def run():
     # Hides the default sidebar
@@ -164,7 +166,25 @@ def run():
     st.markdown("---")
 
     # --- CURRICULUM SECTION ---
-    st.subheader(t["curriculum"])
+
+    # 1. Define the columns FIRST
+    curriculum_col, button_col = st.columns([5, 3])
+
+    # 2. Use the defined columns for the header and the button
+    with curriculum_col:
+        st.subheader(t["curriculum"])
+
+    with button_col:
+        st.write("")
+        if st.button("🔁 Reset course"): # Note: The button text should probably match your UI ("Reset course")
+            gso.write_to_cell(gso.get_topics_status_cell_id(st.session_state.username), {})
+            st.success('Course reset successful')
+            st.session_state.completed_topics = {
+            canon: ["No" for _ in topics_localized_by_canonical[canon]] for canon in canonical_sections
+            }
+            st.rerun()
+
+    # 3. Continue with the rest of your curriculum logic (outside the column blocks)
 
     # Determine which canonical section index is unlocked (first not fully Yes)
     section_unlock_index = 0
@@ -174,6 +194,18 @@ def run():
             break
     else:
         section_unlock_index = len(canonical_sections) - 1
+
+    # # --- CURRICULUM SECTION ---
+    # st.subheader(t["curriculum"])
+
+    # # Determine which canonical section index is unlocked (first not fully Yes)
+    # section_unlock_index = 0
+    # for i, canon in enumerate(canonical_sections):
+    #     if not all(s == "Yes" for s in st.session_state.completed_topics[canon]):
+    #         section_unlock_index = i
+    #         break
+    # else:
+    #     section_unlock_index = len(canonical_sections) - 1
 
     # Display each canonical section, but show localized title & localized topics
     for s_index, canon in enumerate(canonical_sections):
