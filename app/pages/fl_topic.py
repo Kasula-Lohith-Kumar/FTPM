@@ -281,7 +281,8 @@ def run():
 
     # When user clicks Start (or if we don't have questions yet) generate quiz questions
     start_button = st.button(t.get('start_quiz', '🚀 Start Quiz'))
-    if start_button and not st.session_state.quiz_questions:
+    # if start_button and not st.session_state.quiz_questions:
+    if start_button
         try:
             raw_quiz = oap.generate_quiz()  # your existing function that returns 5 questions
             qs = normalize_quiz_output(raw_quiz)
