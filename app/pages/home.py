@@ -212,5 +212,9 @@ def show_home_content():
 
 
 # ✅ Render only if on home page
+if 'page_status' not in st.session_state:
+        st.session_state['page_status'] = 'home'
+        # st.switch_page("pages/home.py")
+
 if st.session_state.get('page_status') == 'home':
     show_home_content()

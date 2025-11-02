@@ -102,10 +102,10 @@ def run():
         st.markdown('</div>', unsafe_allow_html=True)
 
 if 'page_status' not in st.session_state:
-    st.session_state['page_status'] = 'home'
-    print('Page status updated to home')
-    print('Switching ➡️  🏠️ Page')
-    st.switch_page('pages/home.py')
+    st.session_state['page_status'] = 'login'
+    # print('Page status updated to home')
+    # print('Switching ➡️  🏠️ Page')
+    # st.switch_page('pages/home.py')
 
 if st.session_state['page_status'] == 'login':
     print('Page Status : login')
