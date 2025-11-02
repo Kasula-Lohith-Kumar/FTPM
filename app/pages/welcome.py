@@ -156,13 +156,13 @@ def run():
         """, unsafe_allow_html=True)
 
     with col3:
-        if st.button("🔒 Smart Portfolio Tracking", key="tracking"):
+        if st.button("📊 Annual Report Analyzer", key="tracking"):
             st.session_state.selected_option = "Portfolio Tracking"
         st.markdown("""
             <div class="feature-card">
                 <div class="feature-icon"></div>
-                <div class="feature-title">Smart Portfolio Tracking</div>
-                <div class="feature-desc">Securely log transactions and see how market changes affect your overall wealth.</div>
+                <div class="feature-title">Annual Report Analyzer</div>
+                <div class="feature-desc">Upload and analyze company financial reports to uncover trends, key metrics, and performance insights.</div>
             </div>
         """, unsafe_allow_html=True)
 
