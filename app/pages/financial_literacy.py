@@ -280,8 +280,8 @@ def run():
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
             st.success("You have been logged out.")
-            # st.stop()
-            finance_app_main.run()
+            st.session_state['page_status'] = 'login'
+            st.switch_page("pages/login.py")
 
 
 # ... (rest of the initialization code remains the same)

@@ -54,7 +54,7 @@ def run():
 
     # --- FILE UPLOAD SECTION ---
     if upload_mode == "📄 Upload Document":
-        st.write("### Step 1: Upload Your Document")
+        st.write("### Upload Your Document")
         uploaded_doc = st.file_uploader("Upload a PDF, DOCX, or TXT file", type=["pdf", "docx", "txt"])
 
         if uploaded_doc:
@@ -96,7 +96,7 @@ def run():
 
     else:
         # --- Upload embeddings directly ---
-        st.write("### Step 1: Upload Your Embeddings")
+        st.write("### Upload Your Embeddings")
         uploaded_embeddings = st.file_uploader("Upload your FAISS / vector DB file", type=["faiss", "pkl", "bin"])
 
         if uploaded_embeddings:
@@ -133,15 +133,21 @@ def run():
 
     # --- FOOTER BUTTONS ---
     st.markdown("<hr>", unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([4, 1])
 
     with col1:
         if st.button("🏠 Return to Dashboard"):
-            st.switch_page("pages/finance_home.py")
+            st.session_state['page_status'] = 'welcome'
+            del st.session_state.selected_option
+            st.switch_page("pages/welcome.py")
 
     with col2:
         if st.button("🚪 Logout"):
+            for key in list(st.session_state.keys()):
+                del st.session_state[key]
             st.session_state.clear()
+            st.success("You have been logged out.")
+            st.session_state['page_status'] = 'login'
             st.switch_page("pages/login.py")
 
 

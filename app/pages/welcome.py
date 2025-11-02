@@ -161,8 +161,8 @@ def run():
     if st.button("🏃 Logout", key="float_back"):
         if 'selected_option' in st.session_state:
             del st.session_state.selected_option
-        st.session_state['page_status'] = 'home'
-        st.switch_page("finance_app_main.py")
+        st.session_state['page_status'] = 'login'
+        st.switch_page("pages/login.py")
     st.markdown('</div>', unsafe_allow_html=True)
 
     # --- INITIALIZATION LOGIC (unchanged) ---
