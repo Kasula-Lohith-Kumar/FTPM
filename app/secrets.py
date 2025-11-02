@@ -19,7 +19,7 @@ def get_openai_key():
         else:
             try:
                 load_dotenv()
-                key = os.getenv("OPENAI_API_KEY")
+                key = os.getenv("OPENAI_API_KEY").strip().replace('"', '')
                 if not key:
                     raise ValueError("OPENAI_API_KEY not found in .env file.")
                 print(f'✅ OpenAPI key loaded from {st.session_state.get("runtime")} successfully!!')

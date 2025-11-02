@@ -12,7 +12,7 @@ if "buffer" not in st.session_state:
 # --- Initialize model ---
 llm = ChatOpenAI(
     model="gpt-4.1-mini",
-    api_key=os.getenv("OPENAI_API_KEY").strip().replace('"', ''),
+    api_key=secrets.get_openai_key(),
     temperature=0.7  # adjust as needed
     )
 
