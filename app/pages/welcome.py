@@ -129,7 +129,7 @@ def run():
     with col3:
         st.markdown('<div class="feature-box"><div class="feature-title">📊 Annual Report Analyzer</div><div class="feature-desc">Upload and analyze company financial reports to uncover trends, key metrics, and performance insights.</div></div>', unsafe_allow_html=True)
         if st.button("Report Analyzer", key="tracking"):
-            st.session_state.selected_option = "Portfolio Tracking"
+            st.session_state.selected_option = "Report Analyzer"
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -151,8 +151,10 @@ def run():
             st.session_state['page_status'] = 'financial_literacy'
             st.switch_page("pages/financial_literacy.py")
 
-        elif st.session_state.selected_option == "Portfolio Tracking":
+        elif st.session_state.selected_option == "Report Analyzer":
             st.markdown('<div style="background-color: #262730; padding: 10px 15px; border-radius: 8px; border-left: 5px solid #007bff;"><span style="color: #6c757d;">💼 Loading Portfolio Tracker...</span></div>', unsafe_allow_html=True)
+            st.session_state['page_status'] = 'report_analyzer'
+            st.switch_page("pages/report_analyzer.py")
 
     # --- LOGOUT BUTTON ---
     st.markdown('<div style="margin-top: 40px; text-align:center;">', unsafe_allow_html=True)
