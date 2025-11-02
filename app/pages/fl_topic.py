@@ -5,6 +5,7 @@ import io
 from openai import OpenAI
 from pages import fl_config
 from app import openai_api_prompts as oap
+from app import langchain_api_prompts as lap
 import json
 from google_sheets.gsheets_operations import get_mappings
 from google_sheets import gsheets_operations as gso
@@ -154,7 +155,8 @@ def run():
                 st.session_state['topic_cache_data'].pop(topic_title, None)
                 st.info("🔄 Regenerating lesson content... please wait.")
                 try:
-                    new_content = oap.learning_material()
+                    # new_content = oap.learning_material()
+                    new_content = lap.learning_material()
                     if new_content:
                         st.session_state['topic_cache_data'][topic_title] = new_content
                         sheet.update_acell(cell, new_content)
@@ -175,7 +177,8 @@ def run():
                 st.write(sheet_value)
                 topic_cache[topic_title] = sheet_value
             else:
-                content = oap.learning_material()
+                # content = oap.learning_material()
+                content = lap.learning_material()
                 if content:
                     st.write(content)
                     topic_cache[topic_title] = content
