@@ -1,12 +1,13 @@
-from app import app_config
-from openai import OpenAI
-import streamlit as st
 import re
 import json
 import tempfile
 import os
+from app import secrets
+from openai import OpenAI
+import streamlit as st
 
-client = OpenAI(api_key=app_config.key)
+
+client = OpenAI(api_key=secrets.get_openai_key())
 
 if "buffer" not in st.session_state:
     st.session_state.buffer = []

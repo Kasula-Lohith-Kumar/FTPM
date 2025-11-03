@@ -24,6 +24,7 @@ def login_verification(input_username: str, input_password: str) -> bool:
         user_records = worksheet.get_all_records()
         
         # 3. SEARCH FOR USERNAME AND VERIFY PASSWORD
+        # print(f'*****{user_records}*****')
         for record in user_records:
             # gspread.get_all_records() uses the column headers as dictionary keys
             
@@ -140,9 +141,11 @@ def load_key_file_data():
     try:
         if is_streamlit_cloud():
             print("🌐 STREAMLIT_RUNTIME detected — loading from Streamlit secrets...")
+            st.session_state['runtime'] = 'streamlit'
             key_data = json.loads(st.secrets["gcp_service_account"])
         else:
             print("💻 LOCAL_RUNTIME detected — loading from local JSON file...")
+            st.session_state['runtime'] = 'local'
             with open(gsc.LOCAL_KEY_PATH, "r") as file:
                 key_data = json.load(file)
         
