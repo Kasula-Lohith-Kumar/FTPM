@@ -212,7 +212,7 @@ def run():
     ):
         st.info(f"🌐 Language changed to **{st.session_state.language}** — regenerating quiz...")
         try:
-            raw_quiz = oap.generate_quiz()
+            raw_quiz = lap.generate_quiz()
             qs = normalize_quiz_output(raw_quiz)
             if qs and len(qs) > 0:
                 st.session_state.quiz_questions = qs[:5]
@@ -248,7 +248,7 @@ def run():
     ):
         st.info(f"🌐 Language changed to **{st.session_state.language}** — regenerating quiz...")
         try:
-            raw_quiz = oap.generate_quiz()
+            raw_quiz = lap.generate_quiz()
             qs = normalize_quiz_output(raw_quiz)
             if qs and len(qs) > 0:
                 st.session_state.quiz_questions = qs[:5]
@@ -287,7 +287,7 @@ def run():
     # if start_button and not st.session_state.quiz_questions:
     if start_button:
         try:
-            raw_quiz = oap.generate_quiz()  # your existing function that returns 5 questions
+            raw_quiz = lap.generate_quiz()  # your existing function that returns 5 questions
             qs = normalize_quiz_output(raw_quiz)
             if not qs or len(qs) < 1:
                 st.error("Could not parse quiz questions from the generator. Please try again.")
@@ -444,12 +444,12 @@ def run():
 
 
     if user_input:
-        oap.add_to_buffer("user", user_input)
+        lap.add_to_buffer("user", user_input)
         # Display chat history
         for msg in st.session_state.buffer:
             with st.chat_message(msg["role"]):
                 # st.markdown(msg["content"])
-                reply = oap.chat_bot()
+                reply = lap.chat_bot()
                 st.session_state.messages.append({"role": "user", "content": user_input})
                 st.session_state.messages.append({"role": "assistant", "content": reply})
                 st.rerun()
