@@ -4,10 +4,11 @@ import json
 import tempfile
 import streamlit as st
 from app import secrets
-from langchain_openai import OpenAIWhisperParser
+from openai import OpenAI
 from langchain_openai import ChatOpenAI
+# from langchain_openai import OpenAITextToSpeech
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
-from langchain_community.tools import OpenAITextToSpeech
+from langchain_community.document_loaders.parsers import OpenAIWhisperParser
 
 
 # --- Initialize buffer ---
@@ -20,6 +21,8 @@ llm = ChatOpenAI(
     api_key=secrets.get_openai_key(),
     temperature=0.7  # adjust as needed
     )
+
+client = OpenAI(api_key=secrets.get_openai_key())
 
 
 
@@ -42,18 +45,17 @@ def learning_material():
 
 def voice(text):
     """
-    Generate text-to-speech audio for the given text using LangChain.
-    Returns raw audio bytes.
+    Generate text-to-speech audio for the given text and return raw audio bytes.
     """
     try:
-        # Initialize the TTS tool from LangChain
-        tts = OpenAITextToSpeech(
+        response = client.audio.speech.create(
             model="gpt-4o-mini-tts",
-            voice="alloy"
+            voice="alloy",
+            input=text
         )
 
-        # Generate the audio bytes
-        audio_bytes = tts.invoke(text)
+        # ✅ Extract raw audio bytes from the binary response
+        audio_bytes = response.read()
 
         return audio_bytes
 
@@ -81,9 +83,7 @@ def generate_quiz():
     """
 
     try:
-        # Initialize LangChain LLM wrapper
-        llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0.7)
-
+        
         # Send the prompt
         response = llm.invoke([HumanMessage(content=prompt)])
 
@@ -121,9 +121,6 @@ def chat_bot():
     Chat-based assistant using LangChain's ChatOpenAI.
     Uses Streamlit session_state for context memory.
     """
-
-    # 🔹 Initialize the model
-    llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0.7)
 
     # 🔹 Prepare the system prompt dynamically
     system_prompt = f"""
