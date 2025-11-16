@@ -4,8 +4,8 @@ from streamlit_mic_recorder import mic_recorder
 import io
 from openai import OpenAI
 from pages import fl_config
-from app import openai_api_prompts as oap
-from app import langchain_api_prompts as lap
+import openai_api_prompts as oap
+import langchain_api_prompts as lap
 import json
 from google_sheets.gsheets_operations import get_mappings
 from google_sheets import gsheets_operations as gso
