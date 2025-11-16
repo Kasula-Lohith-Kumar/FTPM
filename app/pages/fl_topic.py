@@ -4,8 +4,8 @@ from streamlit_mic_recorder import mic_recorder
 import io
 from openai import OpenAI
 from pages import fl_config
-from app import openai_api_prompts as oap
-from app import langchain_api_prompts as lap
+# import openai_api_prompts as oap
+import langchain_api_prompts as lap
 import json
 from google_sheets.gsheets_operations import get_mappings
 from google_sheets import gsheets_operations as gso
@@ -54,16 +54,49 @@ def run():
         }
         return mapping.get(language, "en")
 
-    def speak_text(text, language):
-        lang_code = get_tts_lang(language)
+    # def speak_text(text, language):
+    #     lang_code = get_tts_lang(language)
+    #     try:
+    #         tts = gTTS(text=text, lang=lang_code)
+    #         audio_bytes = io.BytesIO()
+    #         tts.write_to_fp(audio_bytes)
+    #         audio_bytes.seek(0)
+    #         st.audio(audio_bytes, format="audio/mp3")
+    #     except Exception as e:
+    #         st.error(f"Error generating audio: {e}")
+
+    def speak_text(text):
+        """
+        Wrapper around voice() to produce Streamlit-safe audio bytes.
+        """
+        audio_bytes = lap.voice(text)
+        if audio_bytes:
+            return audio_bytes
+        return None
+
+    def safe_speak(text, fallback_text):
         try:
-            tts = gTTS(text=text, lang=lang_code)
-            audio_bytes = io.BytesIO()
-            tts.write_to_fp(audio_bytes)
-            audio_bytes.seek(0)
-            st.audio(audio_bytes, format="audio/mp3")
+            # Try primary text
+            audio = speak_text(text)
+            return audio
+
         except Exception as e:
-            st.error(f"Error generating audio: {e}")
+            msg = str(e)
+
+            # Handle 429 rate limits
+            if "429" in msg or "Too Many Requests" in msg:
+                st.error("⚠️ Too many requests — playing fallback audio.")
+                try:
+                    return speak_text(fallback_text)
+                except:
+                    return None
+
+            # Other errors → fallback audio
+            st.error("⚠️ Error generating audio — playing fallback audio.")
+            try:
+                return speak_text(fallback_text)
+            except:
+                return None
 
     # --- Header & language setup ---
     lang = st.session_state.language
@@ -146,7 +179,16 @@ def run():
 
         with col1:
             if st.button(t["speak_button"], key="speaker_button"):
-                speak_text(f"{topic_title}. " + t["topic_intro"], st.session_state.language)
+                topic_text = st.session_state['topic_cache_data'].get(topic_title)
+                fallback_text = f"{topic_title}. " + t["topic_intro"]
+
+                if topic_text:
+                    audio = safe_speak(topic_text, fallback_text)
+                else:
+                    audio = safe_speak(fallback_text, fallback_text)
+
+                if audio:
+                    st.audio(audio, format="audio/mp3")
 
         with col2:
             # 🔄 Refresh button: clear cache and regenerate only for this topic
@@ -212,7 +254,7 @@ def run():
     ):
         st.info(f"🌐 Language changed to **{st.session_state.language}** — regenerating quiz...")
         try:
-            raw_quiz = oap.generate_quiz()
+            raw_quiz = lap.generate_quiz()
             qs = normalize_quiz_output(raw_quiz)
             if qs and len(qs) > 0:
                 st.session_state.quiz_questions = qs[:5]
@@ -248,7 +290,7 @@ def run():
     ):
         st.info(f"🌐 Language changed to **{st.session_state.language}** — regenerating quiz...")
         try:
-            raw_quiz = oap.generate_quiz()
+            raw_quiz = lap.generate_quiz()
             qs = normalize_quiz_output(raw_quiz)
             if qs and len(qs) > 0:
                 st.session_state.quiz_questions = qs[:5]
@@ -287,7 +329,7 @@ def run():
     # if start_button and not st.session_state.quiz_questions:
     if start_button:
         try:
-            raw_quiz = oap.generate_quiz()  # your existing function that returns 5 questions
+            raw_quiz = lap.generate_quiz()  # your existing function that returns 5 questions
             qs = normalize_quiz_output(raw_quiz)
             if not qs or len(qs) < 1:
                 st.error("Could not parse quiz questions from the generator. Please try again.")
@@ -413,7 +455,7 @@ def run():
             st.write(msg["content"])
 
     # Input + mic + speaker ribbon
-    chat_col1, chat_col2 = st.columns([8, 1])
+    chat_col1, chat_col2, chat_col3 = st.columns([8, 1, 5])
     # chat_col1, chat_col2, chat_col3 = st.columns([8, 1, 1])
 
     with chat_col1:
@@ -427,10 +469,24 @@ def run():
 
     with chat_col2:
         if st.button("🔊", key="chat_speaker"):
+            fallback_text = 'Currently this audio feature is not supported'
             if st.session_state.messages:
-                speak_text(st.session_state.messages[-1]["content"], st.session_state.language)
+                # speak_text(st.session_state.messages[-1]["content"], st.session_state.language)
+                audio = safe_speak(st.session_state.messages[-1]["content"], fallback_text)
             else:
+                fallback_text = "No response to speak yet."
+                audio = safe_speak(fallback_text, fallback_text)
                 st.warning("No response to speak yet.")
+
+            if audio:
+                    st.audio(audio, format="audio/mp3")
+
+    with chat_col3:
+        if st.button("🚮 Clear Chat", key="clear_chat_history"):
+            st.session_state.messages = []
+            st.toast("Chat history cleared!", icon="🗑️")
+            st.rerun()   # 🔥 immediately refresh UI
+
 
     # Process input or voice
     # if audio_input:
@@ -444,12 +500,12 @@ def run():
 
 
     if user_input:
-        oap.add_to_buffer("user", user_input)
+        lap.add_to_buffer("user", user_input)
         # Display chat history
         for msg in st.session_state.buffer:
             with st.chat_message(msg["role"]):
                 # st.markdown(msg["content"])
-                reply = oap.chat_bot()
+                reply = lap.chat_bot()
                 st.session_state.messages.append({"role": "user", "content": user_input})
                 st.session_state.messages.append({"role": "assistant", "content": reply})
                 st.rerun()
@@ -467,6 +523,7 @@ def run():
             st.session_state.completed_topics[current_canon_name][current_topic_idx] = "Yes"
             st.session_state['page_status'] = 'financial_literacy'
             gso.write_to_cell(gso.get_topics_status_cell_id(st.session_state.username), st.session_state.completed_topics)
+            del st.session_state.messages
         st.toast("Topic completed! Proceeding to the next lesson.")
         st.switch_page("pages/financial_literacy.py")
 

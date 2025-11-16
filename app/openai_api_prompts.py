@@ -2,9 +2,10 @@ import re
 import json
 import tempfile
 import os
-from app import secrets
+import secrets
 from openai import OpenAI
 import streamlit as st
+# from langchain_openai import OpenAIWhisperParser
 
 
 client = OpenAI(api_key=secrets.get_openai_key())
