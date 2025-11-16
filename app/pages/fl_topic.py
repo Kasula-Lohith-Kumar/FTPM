@@ -65,6 +65,30 @@ def run():
         except Exception as e:
             st.error(f"Error generating audio: {e}")
 
+    def safe_speak(text, language, fallback_text):
+        try:
+            # Try generating main audio
+            return speak_text(text, language)
+
+        except Exception as e:
+            msg = str(e)
+
+            # Handle 429 Too Many Requests
+            if "429" in msg or "Too Many Requests" in msg:
+                st.error("⚠️ Too many requests — playing fallback audio.")
+                # Try generating fallback audio ONCE
+                try:
+                    return speak_text(fallback_text, language)
+                except:
+                    return None  # prevent infinite retry loop
+
+            # Other errors → still fallback
+            st.error("⚠️ Error generating audio — playing fallback audio.")
+            try:
+                return speak_text(fallback_text, language)
+            except:
+                return None
+
     # --- Header & language setup ---
     lang = st.session_state.language
     t = fl_config.translations[lang]
@@ -146,14 +170,17 @@ def run():
 
         with col1:
             if st.button(t["speak_button"], key="speaker_button"):
-                if st.session_state['topic_cache_data'][topic_title]:
-                    topic_text = st.session_state['topic_cache_data'][topic_title]
-                    if topic_text:
-                        speak_text(topic_text, st.session_state.language)       
-                    else:
-                        speak_text(f"{topic_title}. " + t["topic_intro"], st.session_state.language)
+
+                topic_text = st.session_state['topic_cache_data'].get(topic_title)
+                fallback_text = f"{topic_title}. " + t["topic_intro"]
+
+                if topic_text:
+                    audio = safe_speak(topic_text, st.session_state.language, fallback_text)
                 else:
-                        speak_text(f"{topic_title}. " + t["topic_intro"], st.session_state.language)
+                    audio = safe_speak(fallback_text, st.session_state.language, fallback_text)
+
+                if audio:
+                    st.audio(audio, format="audio/mp3")
 
         with col2:
             # 🔄 Refresh button: clear cache and regenerate only for this topic
