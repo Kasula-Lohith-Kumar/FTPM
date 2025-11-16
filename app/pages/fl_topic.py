@@ -516,6 +516,9 @@ def run():
             st.session_state.completed_topics[current_canon_name][current_topic_idx] = "Yes"
             st.session_state['page_status'] = 'financial_literacy'
             gso.write_to_cell(gso.get_topics_status_cell_id(st.session_state.username), st.session_state.completed_topics)
+        chat_key = t.get("chatbot_input", "💬 ChatBot with 5 Messages Memory, Ask your question...")
+        if chat_key in st.session_state:
+            del st.session_state[chat_key]
         st.toast("Topic completed! Proceeding to the next lesson.")
         st.switch_page("pages/financial_literacy.py")
 
