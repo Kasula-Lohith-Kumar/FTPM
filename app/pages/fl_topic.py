@@ -469,9 +469,13 @@ def run():
 
     with chat_col2:
         if st.button("🔊", key="chat_speaker"):
+            fallback_text = 'Currently this audio feature is not supported'
             if st.session_state.messages:
-                speak_text(st.session_state.messages[-1]["content"], st.session_state.language)
+                # speak_text(st.session_state.messages[-1]["content"], st.session_state.language)
+                safe_speak(st.session_state.messages[-1]["content"], fallback_text)
             else:
+                fallback_text = "No response to speak yet."
+                safe_speak(fallback_text, fallback_text)
                 st.warning("No response to speak yet.")
 
     # Process input or voice
