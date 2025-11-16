@@ -54,40 +54,47 @@ def run():
         }
         return mapping.get(language, "en")
 
-    def speak_text(text, language):
-        lang_code = get_tts_lang(language)
-        try:
-            tts = gTTS(text=text, lang=lang_code)
-            audio_bytes = io.BytesIO()
-            tts.write_to_fp(audio_bytes)
-            audio_bytes.seek(0)
-            st.audio(audio_bytes, format="audio/mp3")
-        except Exception as e:
-            st.error(f"Error generating audio: {e}")
+    # def speak_text(text, language):
+    #     lang_code = get_tts_lang(language)
+    #     try:
+    #         tts = gTTS(text=text, lang=lang_code)
+    #         audio_bytes = io.BytesIO()
+    #         tts.write_to_fp(audio_bytes)
+    #         audio_bytes.seek(0)
+    #         st.audio(audio_bytes, format="audio/mp3")
+    #     except Exception as e:
+    #         st.error(f"Error generating audio: {e}")
 
-    def safe_speak(text, language, fallback_text):
+    def speak_text(text):
+        """
+        Wrapper around voice() to produce Streamlit-safe audio bytes.
+        """
+        audio_bytes = lap.voice(text)
+        if audio_bytes:
+            return audio_bytes
+        return None
+
+    def safe_speak(text, fallback_text):
         try:
-            # Try generating main audio
-            speak_output = speak_text(text, language)
-            print(f'speak_output : {speak_output}')
-            return speak_output
+            # Try primary text
+            audio = speak_text(text)
+            return audio
 
         except Exception as e:
             msg = str(e)
 
-            # Handle 429 Too Many Requests
+            # Handle 429 rate limits
             if "429" in msg or "Too Many Requests" in msg:
                 st.error("⚠️ Too many requests — playing fallback audio.")
-                # Try generating fallback audio ONCE
                 try:
-                    return speak_text(fallback_text, language)
+                    return speak_text(fallback_text)
                 except:
-                    return None  # prevent infinite retry loop
+                    return None
 
-            # Other errors → still fallback
+            # Other errors → fallback audio
             st.error("⚠️ Error generating audio — playing fallback audio.")
             try:
-                return speak_text(fallback_text, language)
+                return speak_text(fallback_text)
             except:
                 return None
 
@@ -172,14 +179,13 @@ def run():
 
         with col1:
             if st.button(t["speak_button"], key="speaker_button"):
-
                 topic_text = st.session_state['topic_cache_data'].get(topic_title)
                 fallback_text = f"{topic_title}. " + t["topic_intro"]
 
                 if topic_text:
-                    audio = safe_speak(topic_text, st.session_state.language, fallback_text)
+                    audio = safe_speak(topic_text, fallback_text)
                 else:
-                    audio = safe_speak(fallback_text, st.session_state.language, fallback_text)
+                    audio = safe_speak(fallback_text, fallback_text)
 
                 if audio:
                     st.audio(audio, format="audio/mp3")

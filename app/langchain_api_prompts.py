@@ -49,7 +49,7 @@ def voice(text):
     """
     try:
         response = client.audio.speech.create(
-            model="gpt-4o-audio",
+            model="gpt-4o-mini-tts",
             voice="alloy",
             input=text
         )
