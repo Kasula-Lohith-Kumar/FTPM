@@ -5,7 +5,7 @@ import os
 import secrets
 from openai import OpenAI
 import streamlit as st
-from langchain_openai import OpenAIWhisperParser
+# from langchain_openai import OpenAIWhisperParser
 
 
 client = OpenAI(api_key=secrets.get_openai_key())
