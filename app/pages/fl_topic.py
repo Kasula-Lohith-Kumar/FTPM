@@ -68,7 +68,9 @@ def run():
     def safe_speak(text, language, fallback_text):
         try:
             # Try generating main audio
-            return speak_text(text, language)
+            speak_output = speak_text(text, language)
+            print(f'speak_output : {speak_output}')
+            return speak_output
 
         except Exception as e:
             msg = str(e)
