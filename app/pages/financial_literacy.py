@@ -1,6 +1,6 @@
 import streamlit as st
 from pages import fl_config
-from app import finance_app_main
+import finance_app_main
 from google_sheets import gsheets_operations as gso
 
 
