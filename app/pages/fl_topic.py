@@ -146,7 +146,14 @@ def run():
 
         with col1:
             if st.button(t["speak_button"], key="speaker_button"):
-                speak_text(f"{topic_title}. " + t["topic_intro"], st.session_state.language)
+                if st.session_state['topic_cache_data'][topic_title]:
+                    topic_text = st.session_state['topic_cache_data'][topic_title]
+                    if topic_text:
+                        speak_text(topic_text, st.session_state.language)       
+                    else:
+                        speak_text(f"{topic_title}. " + t["topic_intro"], st.session_state.language)
+                else:
+                        speak_text(f"{topic_title}. " + t["topic_intro"], st.session_state.language)
 
         with col2:
             # 🔄 Refresh button: clear cache and regenerate only for this topic
