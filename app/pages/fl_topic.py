@@ -472,11 +472,14 @@ def run():
             fallback_text = 'Currently this audio feature is not supported'
             if st.session_state.messages:
                 # speak_text(st.session_state.messages[-1]["content"], st.session_state.language)
-                safe_speak(st.session_state.messages[-1]["content"], fallback_text)
+                audio = safe_speak(st.session_state.messages[-1]["content"], fallback_text)
             else:
                 fallback_text = "No response to speak yet."
-                safe_speak(fallback_text, fallback_text)
+                audio = safe_speak(fallback_text, fallback_text)
                 st.warning("No response to speak yet.")
+
+            if audio:
+                    st.audio(audio, format="audio/mp3")
 
     # Process input or voice
     # if audio_input:
