@@ -8,12 +8,12 @@ from app import secrets
 from openai import OpenAI
 from langchain_openai import ChatOpenAI
 # from langchain_openai import OpenAITextToSpeech
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
+from langchain_community.chains import RetrievalQA
+from langchain_core.prompts import PromptTemplate
 from langchain_community.vectorstores import FAISS
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langchain_community.document_loaders.parsers import OpenAIWhisperParser
 
@@ -247,9 +247,9 @@ def faiss_db(splits):
     db = FAISS.from_documents(splits, embedding)
     return db
 
-def text_retraivalQA(doc, query):
+def text_retraivalQA(combined_text, query):
     
-    text_splits  = process_text_data(doc)
+    text_splits  = process_text_data(combined_text)
     database = faiss_db(text_splits)
 
     template = """Use the following pieces of context to answer the question at the end. 
@@ -267,6 +267,6 @@ def text_retraivalQA(doc, query):
         return_source_documents=True,
         chain_type_kwargs={"prompt": QA_CHAIN_PROMPT})
 
-    result = qa_chain({"query": "average size of payment transactions analysed for december 2021"})
+    result = qa_chain({"query": f'{query}'})
 
     return result
