@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import faiss
 import tempfile
 import tiktoken
 import streamlit as st
@@ -28,6 +29,13 @@ llm = ChatOpenAI(
     api_key=secrets.get_openai_key(),
     temperature=0.7  # adjust as needed
     )
+
+llm_embd = ChatOpenAI(
+        model="gpt-4o",
+        temperature=0,
+        api_key=secrets.get_openai_key()
+    )
+
 
 client = OpenAI(api_key=secrets.get_openai_key())
 
@@ -193,11 +201,6 @@ def describe_image(base64_image: str):
     and return the extracted text plus a summary.
     """
 
-    llm = ChatOpenAI(
-        model="gpt-4o",
-        temperature=0
-    )
-
     # Prepare messages
     messages = [
         SystemMessage(
@@ -227,13 +230,16 @@ def describe_image(base64_image: str):
         )
     ]
 
-    response = llm.invoke(messages)
+    response = llm_embd.invoke(messages)
     return response.content
 
 
-def process_text_data(file_path):
+def process_text_data(combined_text):
 
-    loader = TextLoader(file_path, encoding="utf-8")
+    with open(r'temp.txt', "w", encoding="utf-8") as f:
+        f.write(combined_text)
+
+    loader = TextLoader(r'temp.txt', encoding="utf-8")
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
@@ -285,3 +291,7 @@ def text_retraivalQA(combined_text, query):
     result = chain.invoke(query)
 
     return result
+
+def save_embd(db, dst_file):
+    temp_path = os.path.join(dst_file, 'data.faiss')
+    faiss.write_index(db.index, temp_path)

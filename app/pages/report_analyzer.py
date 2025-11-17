@@ -1,6 +1,8 @@
-import streamlit as st
-import tempfile
 import os
+import tempfile
+import streamlit as st
+import document_processor as dp
+import langchain_api_prompts as lap
 
 def run():
     # --- HIDE DEFAULT SIDEBAR ---
@@ -68,13 +70,22 @@ def run():
                 # --- PLACE YOUR EMBEDDING LOGIC HERE ---
                 # Example:
                 # embedding_path = generate_embeddings(temp_doc_path)
+                combined_text = dp.extract_images_and_text_from_pdf(temp_doc_path)
+                splits = lap.process_text_data(combined_text)
+                faiss_database = lap.faiss_db(splits)
 
-                fake_embed_path = os.path.join(tempfile.gettempdir(), "generated_embeddings.faiss")
-                with open(fake_embed_path, "w") as f:
-                    f.write("Temporary embedding data placeholder")
+                embed_path = os.path.join(tempfile.gettempdir(), "embeddings")
+
+                if not os.path.exists(embed_path):
+                    os.makedirs(embed_path, exist_ok=True)
+                
+                lap.save_embd(faiss_database, embed_path)
+
+                # with open(os.path.join(tempfile.gettempdir(), "data.faiss"), "w") as f:
+                #     f.write(faiss_database)
 
                 st.session_state.embeddings_generated = True
-                st.session_state.temp_embedding_path = fake_embed_path
+                st.session_state.temp_embedding_path = embed_path
                 st.success("✅ Embeddings generated successfully!")
 
         # --- If embeddings are generated ---
