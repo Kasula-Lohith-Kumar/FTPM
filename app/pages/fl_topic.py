@@ -455,7 +455,7 @@ def run():
             st.write(msg["content"])
 
     # Input + mic + speaker ribbon
-    chat_col1, chat_col2, chat_col3 = st.columns([8, 1, 5])
+    chat_col1, chat_col2, chat_col3 = st.columns([8, 1, 1])
     # chat_col1, chat_col2, chat_col3 = st.columns([8, 1, 1])
 
     with chat_col1:

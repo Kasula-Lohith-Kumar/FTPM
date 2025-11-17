@@ -2,11 +2,18 @@ import os
 import re
 import json
 import tempfile
+import tiktoken
 import streamlit as st
 from app import secrets
 from openai import OpenAI
 from langchain_openai import ChatOpenAI
 # from langchain_openai import OpenAITextToSpeech
+from langchain.chains import RetrievalQA
+from langchain.prompts import PromptTemplate
+from langchain_community.vectorstores import FAISS
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_community.document_loaders import TextLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langchain_community.document_loaders.parsers import OpenAIWhisperParser
 
@@ -178,3 +185,88 @@ def audio_transcription(audio_file):
     os.remove(temp_path)
 
     return transcription_text
+
+
+def describe_image(base64_image: str):
+    """
+    Uses OpenAI GPT-4o with LangChain to extract text from an image
+    and return the extracted text plus a summary.
+    """
+
+    llm = ChatOpenAI(
+        model="gpt-4o",
+        temperature=0
+    )
+
+    # Prepare messages
+    messages = [
+        SystemMessage(
+            content=(
+                "Your job is to extract all the information from the images, including the text. "
+                "Extract all the text from the image without changing the order or structure of the information. "
+                "Recheck if all the text has been extracted correctly and return in the same presentation "
+                "and structure as present in the original image."
+            )
+        ),
+        HumanMessage(
+            content=[
+                {
+                    "type": "text",
+                    "text": (
+                        "extract ALL the text from the image in the same structure as present in the image. "
+                        "and then after it summarise everything in brief, do not miss anything."
+                    ),
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/png;base64,{base64_image}"
+                    },
+                },
+            ]
+        )
+    ]
+
+    response = llm.invoke(messages)
+    return response.content
+
+
+def process_text_data(file_path):
+    loaders = TextLoader("combined_text.txt")
+    text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size = 500,
+    chunk_overlap = 60,
+    separators=["\n\n","\n"])
+    splits = text_splitter.split_documents(loaders.load())
+
+    return splits
+
+
+def faiss_db(splits):
+    embedding = OpenAIEmbeddings(api_key=secrets.get_openai_key())
+    db = FAISS.from_documents(splits, embedding)
+    return db
+
+def text_retraivalQA(doc, query):
+    
+    text_splits  = process_text_data(doc)
+    database = faiss_db(text_splits)
+
+    template = """Use the following pieces of context to answer the question at the end. 
+    If you don't know the answer and dont find it in the given context, 
+    just say that you don't know , don't try to make up an answer.
+    {context}
+    Question: {question}
+    Helpful Answer:"""
+
+    QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
+
+    qa_chain = RetrievalQA.from_chain_type(
+        llm,
+        retriever=database.as_retriever(),
+        return_source_documents=True,
+        chain_type_kwargs={"prompt": QA_CHAIN_PROMPT})
+
+    result = qa_chain({"query": "average size of payment transactions analysed for december 2021"})
+
+    return result
