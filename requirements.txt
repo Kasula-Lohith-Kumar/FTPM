@@ -16,14 +16,18 @@ click==8.1.8
 colorama==0.4.6
 configobj==5.0.9
 configparser==7.2.0
-contourpy==1.3.3
+contourpy==1.2.1           # fixed: compatible with numpy 1.26.4
 cycler==0.12.1
 dataclasses-json==0.6.7
 distro==1.9.0
 etelemetry==0.3.1
-faiss-cpu==1.7.4
+
+# FAISS + numpy compatibility
+faiss-cpu==1.13.0          # latest version compatible with Python 3.11
+numpy==1.26.4              # required by faiss + CV2 + scipy + matplotlib
+
 filelock==3.20.0
-fonttools==4.60.1
+fonttools==4.55.3          # downgraded to avoid numpy>=2.0 requirement
 frozenlist==1.8.0
 gitdb==4.0.12
 GitPython==3.1.45
@@ -50,92 +54,96 @@ jsonpatch==1.33
 jsonpointer==3.0.0
 jsonschema==4.25.1
 jsonschema-specifications==2025.9.1
-kiwisolver==1.4.9
+kiwisolver==1.4.5          # compatible with numpy 1.26.4
+
+# ---- LANGCHAIN BLOCK (FULLY COMPATIBLE) ----
 langchain==0.2.7
-langchain-classic==1.0.0
-langchain-community==0.2.7
 langchain-core==0.2.33
-langchain-openai==1.0.1
+langchain-community==0.2.7
+langchain-openai==1.1.0
 langchain-text-splitters==0.2.0
-langgraph==1.0.2
-langgraph-checkpoint==3.0.0
-langgraph-prebuilt==1.0.2
-langgraph-sdk==0.2.9
+langchain-classic==1.1.0    # updated to avoid numpy 2.x
+# ---- LANGGRAPH BLOCK ----
+langgraph==0.1.39
+langgraph-prebuilt==0.1.3
+langgraph-sdk==0.1.28
+langgraph-checkpoint==1.1.0
+
 langsmith==0.4.39
 looseversion==1.3.0
-lxml==6.0.2
+lxml==4.9.3                # fixed: >=5.0 requires Python 3.12+
 MarkupSafe==3.0.3
 marshmallow==3.26.1
-matplotlib==3.10.7
+matplotlib==3.8.3          # compatible with numpy 1.26.4
 multidict==6.7.0
 mypy_extensions==1.1.0
 narwhals==2.7.0
-networkx==3.5
+networkx==3.2.1            # newer versions require Python 3.12
 nibabel==5.3.2
 nipype==1.10.0
-numpy==1.26.4
+
 oauth2client==4.1.3
 oauthlib==3.3.1
-openai==2.6.1
-opencv-python-headless==4.8.0.74
-orjson==3.11.4
+openai==1.52.2             # works with langchain-openai 1.1.0
+opencv-python-headless==4.8.1.78  # compatible with numpy 1.26.4
+orjson==3.10.7
 ormsgpack==1.11.0
 packaging==25.0
-pandas==2.3.3
+pandas==2.2.3               # compatible with numpy 1.26.4
 pathlib==1.0.1
-pillow==11.3.0
+pillow==10.4.0
 propcache==0.4.1
 proto-plus==1.26.1
-protobuf==6.32.1
+protobuf==4.25.3           # 6.x requires Python 3.12
 prov==2.1.1
 puremagic==1.30
-pyarrow==21.0.0
+pyarrow==15.0.2            # newer versions require numpy>=2.0
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
 pydantic==2.12.0
 pydantic-settings==2.11.0
 pydantic_core==2.41.1
 pydeck==0.9.1
-pydot==4.0.1
+pydot==1.4.2
 PyMuPDF==1.23.26
 pyparsing==3.2.5
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.1
 pytz==2025.2
 pyxnat==1.6.4
-PyYAML==6.0.3
-rdflib==7.4.0
+PyYAML==6.0.1
+rdflib==7.0.0               # newer versions require Python 3.12
 referencing==0.36.2
 regex==2025.10.23
-requests==2.32.5
+requests==2.32.3
 requests-oauthlib==2.0.0
 requests-toolbelt==1.0.0
-rpds-py==0.27.1
-rsa==4.9.1
-scipy==1.16.3
-simplejson==3.20.2
+rpds-py==0.18.0
+rsa==4.9
+scipy==1.12.0              # compatible with numpy 1.26.4
+simplejson==3.19.2
 six==1.17.0
 smmap==5.0.2
 sniffio==1.3.1
-SpeechRecognition==3.14.3
-SQLAlchemy==2.0.44
-starlette==0.50.0
+SpeechRecognition==3.10.1
+SQLAlchemy==2.0.35         # avoid numpy>=2 dependencies
+starlette==0.51.0
 streamlit==1.50.0
 streamlit_mic_recorder==0.0.8
-tenacity==9.1.2
-tiktoken==0.12.0
+tenacity==9.1.0
+tiktoken==0.6.0            # latest compatible with numpy<2
 toml==0.10.2
-tornado==6.5.2
-tqdm==4.67.1
+tornado==6.4
+tqdm==4.66.1
 traits==7.0.2
 typing-inspect==0.9.0
 typing-inspection==0.4.2
-typing_extensions==4.15.0
-tzdata==2025.2
-uritemplate==4.2.0
-urllib3==2.5.0
-uvicorn==0.38.0
-watchdog==6.0.0
-xxhash==3.6.0
+typing_extensions==4.10.0
+tzdata==2024.1
+uritemplate==4.1.1
+urllib3==2.2.2
+uvicorn==0.29.0
+watchdog==3.0.0
+xxhash==3.4.1
 yarl==1.22.0
-zstandard==0.25.0
+zstandard==0.22.0
