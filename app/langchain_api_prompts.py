@@ -8,14 +8,14 @@ from app import secrets
 from openai import OpenAI
 from langchain_openai import ChatOpenAI
 # from langchain_openai import OpenAITextToSpeech
-from langchain_community.chains import RetrievalQA
+from langchain_core.runnables import RunnablePassthrough
 from langchain_core.prompts import PromptTemplate
-from langchain_community.vectorstores import FAISS
-from langchain_openai import OpenAIEmbeddings
-from langchain_community.document_loaders import TextLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langchain_community.document_loaders.parsers import OpenAIWhisperParser
+from langchain_community.document_loaders import TextLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
 
 
 # --- Initialize buffer ---
@@ -232,41 +232,56 @@ def describe_image(base64_image: str):
 
 
 def process_text_data(file_path):
-    loaders = TextLoader("combined_text.txt")
-    text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size = 500,
-    chunk_overlap = 60,
-    separators=["\n\n","\n"])
-    splits = text_splitter.split_documents(loaders.load())
 
+    loader = TextLoader(file_path, encoding="utf-8")
+
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=500,
+        chunk_overlap=60,
+        separators=["\n\n", "\n"]
+    )
+
+    splits = text_splitter.split_documents(loader.load())
     return splits
 
 
 def faiss_db(splits):
+
     embedding = OpenAIEmbeddings(api_key=secrets.get_openai_key())
+
     db = FAISS.from_documents(splits, embedding)
     return db
 
 def text_retraivalQA(combined_text, query):
-    
-    text_splits  = process_text_data(combined_text)
+
+    # Step 1: Split text (your existing helper)
+    text_splits = process_text_data(combined_text)
+
+    # Step 2: Build vector DB
     database = faiss_db(text_splits)
+    retriever = database.as_retriever()
 
-    template = """Use the following pieces of context to answer the question at the end. 
-    If you don't know the answer and dont find it in the given context, 
-    just say that you don't know , don't try to make up an answer.
-    {context}
-    Question: {question}
-    Helpful Answer:"""
+    # Step 3: Prompt template
+    template = """Use the following pieces of context to answer the question at the end.
+                If you don't know the answer and don't find it in the given context,
+                just say that you don't know. Don't try to make up an answer.
 
+                {context}
+
+                Question: {question}
+
+                Helpful Answer:
+                """
     QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
 
-    qa_chain = RetrievalQA.from_chain_type(
-        llm,
-        retriever=database.as_retriever(),
-        return_source_documents=True,
-        chain_type_kwargs={"prompt": QA_CHAIN_PROMPT})
+    # Step 4: Build RetrievalQA manually using Runnable syntax
+    chain = (
+        {"context": retriever, "question": RunnablePassthrough()}
+        | QA_CHAIN_PROMPT
+        | llm
+    )
 
-    result = qa_chain({"query": f'{query}'})
+    # Step 5: Invoke chain
+    result = chain.invoke(query)
 
     return result
