@@ -366,7 +366,7 @@ def load_chroma_from_zip(zip_file):
     # Load the Chroma DB
     db = Chroma(
         embedding_function=llm_embd,
-        persist_directory=persist_dir
+        persist_directory=str(persist_dir)
     )
 
     st.session_state.temp_embedding_path = str(persist_dir)
