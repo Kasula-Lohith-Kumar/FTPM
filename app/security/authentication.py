@@ -173,19 +173,19 @@ def load_key_file_data():
         st.error(f"Unexpected error: {e}")
         return None
     
-# def is_streamlit_cloud() -> bool:
-#     """Detect Streamlit Cloud by checking if st.secrets has Streamlit-managed credentials."""
-#     print('GCP Service Account Check ...')
-#     try:
-#         _ = st.Secrets["gcp_service_account"]
-#         return True
-#     except Exception:
-#         return False
+def is_streamlit_cloud() -> bool:
+    """Detect Streamlit Cloud by checking if st.secrets has Streamlit-managed credentials."""
+    print('GCP Service Account Check ...')
+    try:
+        _ = st.Secrets["gcp_service_account"]
+        return True
+    except Exception:
+        return False
 
 # def is_streamlit_cloud() -> bool:
 #     """Detect Streamlit Cloud reliably."""
 #     return os.environ.get("STREAMLIT_RUNTIME") == "cloud"
 
-def is_streamlit_cloud():
-    return "STREAMLIT_SERVER_HOST" in os.environ and \
-           os.environ["STREAMLIT_SERVER_HOST"].endswith(".streamlit.app")
+# def is_streamlit_cloud():
+#     return "STREAMLIT_SERVER_HOST" in os.environ and \
+#            os.environ["STREAMLIT_SERVER_HOST"].endswith(".streamlit.app")
