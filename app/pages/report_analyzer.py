@@ -99,16 +99,9 @@ def run():
     else:
         # --- Upload embeddings directly ---
         st.write("### Upload Your Embeddings")
-        uploaded_embeddings = st.file_uploader("Upload your FAISS / vector DB file", type=["faiss", "pkl", "bin"])
-
+        uploaded_embeddings = st.file_uploader("Upload your Chroma DB (.zip)", type=["zip"])
         if uploaded_embeddings:
-            temp_embed_path = os.path.join(tempfile.gettempdir(), uploaded_embeddings.name)
-            with open(temp_embed_path, "wb") as f:
-                f.write(uploaded_embeddings.getbuffer())
-
-            st.session_state.temp_embedding_path = temp_embed_path
-            st.success(f"✅ Embeddings '{uploaded_embeddings.name}' uploaded successfully!")
-            st.info("📄 Document upload disabled since embeddings are provided directly.")
+            db = lap.load_chroma_from_zip(uploaded_embeddings)
 
             if st.button("🚀 Start Analysis"):
                 st.session_state.start_analysis = True

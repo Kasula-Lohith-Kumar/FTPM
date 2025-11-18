@@ -3,6 +3,7 @@ import re
 import json
 # import faiss
 import tempfile
+import zipfile
 import tiktoken
 import config
 import streamlit as st
@@ -372,4 +373,8 @@ def load_chroma_from_zip(zip_file):
         persist_directory=persist_dir
     )
 
+    st.session_state.temp_embedding_path = persist_dir
+    st.success(f"✅ Embeddings '{persist_dir.name}' uploaded successfully!")
+    st.info("📄 Document upload disabled since embeddings are provided directly.")
+    
     return db
