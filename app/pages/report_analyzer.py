@@ -52,10 +52,11 @@ def run():
         ("📄 Upload Document", "🧠 Upload Embeddings"),
         horizontal=True,
     )
-    st.session_state.upload_mode = upload_mode
     if st.session_state.upload_mode != upload_mode:
         st.session_state.start_analysis = False
         st.session_state.embeddings_generated = False
+        st.session_state.chat_history = []
+    st.session_state.upload_mode = upload_mode
 
     # --- FILE UPLOAD SECTION ---
     if upload_mode == "📄 Upload Document":
