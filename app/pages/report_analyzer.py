@@ -53,11 +53,12 @@ def run():
         horizontal=True,
     )
     st.session_state.upload_mode = upload_mode
+    if st.session_state.upload_mode != upload_mode:
+        st.session_state.start_analysis = False
+        st.session_state.embeddings_generated = False
 
     # --- FILE UPLOAD SECTION ---
     if upload_mode == "📄 Upload Document":
-        st.session_state.start_analysis = False
-        st.session_state.embeddings_generated = False
         # if not st.session_state.start_analysis or not st.session_state.embeddings_generated:
         #     st.rerun()
         st.write("### Upload Your Document")
