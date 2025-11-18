@@ -40,8 +40,6 @@ llm_embd = ChatOpenAI(
     )
 
 
-embedding = OpenAIEmbeddings(api_key=streamlit_secrets.get_openai_key())
-
 client = OpenAI(api_key=streamlit_secrets.get_openai_key())
 
 
@@ -364,12 +362,9 @@ def load_chroma_from_zip(zip_file):
     # Find extracted folder (first subdir)
     subdirs = [os.path.join(temp_dir, d) for d in os.listdir(temp_dir)]
     persist_dir = subdirs[0]     # the actual chroma folder
-
-    embeddings = OpenAIEmbeddings()
-
     # Load the Chroma DB
     db = Chroma(
-        embedding_function=embeddings,
+        embedding_function=llm_embd,
         persist_directory=persist_dir
     )
 
