@@ -101,7 +101,7 @@ def run():
         st.write("### Upload Your Embeddings")
         uploaded_embeddings = st.file_uploader("Upload your Chroma DB (.zip)", type=["zip"])
         if uploaded_embeddings:
-            db = lap.load_chroma_from_zip(uploaded_embeddings)
+            db_file = lap.load_chroma_from_zip(uploaded_embeddings)
 
             if st.button("🚀 Start Analysis"):
                 st.session_state.start_analysis = True
@@ -117,7 +117,8 @@ def run():
 
         if user_input:
             # Placeholder chatbot response (replace with your model logic)
-            response = f"🤖 (Mock Response) The analysis for '{user_input}' will appear here."
+            response = lap.text_retraivalQA(db_file, user_input)
+            # response = f"🤖 (Mock Response) The analysis for '{user_input}' will appear here."
             st.session_state.chat_history.append((user_input, response))
 
         # Display chat
