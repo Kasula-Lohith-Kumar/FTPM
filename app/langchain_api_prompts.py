@@ -34,11 +34,10 @@ llm = ChatOpenAI(
     temperature=0.7  # adjust as needed
     )
 
-llm_embd = ChatOpenAI(
-        model="gpt-4o",
-        temperature=0,
-        api_key=streamlit_secrets.get_openai_key()
-    )
+llm_embd = OpenAIEmbeddings(
+    model="text-embedding-3-large",    # recommended
+    api_key=streamlit_secrets.get_openai_key()
+)
 
 
 client = OpenAI(api_key=streamlit_secrets.get_openai_key())
