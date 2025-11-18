@@ -337,16 +337,16 @@ def save_embd(db, dst_file):
 
 def save_chroma_embd(db):
     """
-    Persists the Chroma vector store to the specified directory.
-    
-    Args:
-        db: The Chroma vector store object.
-        dst_dir: The destination directory to save the database files.
+    Persists the Chroma vector store to disk.
+    Returns:
+        True  -> if persist succeeds
+        False -> if persist fails
     """
+    try:
+        db.persist()
+        print("Chroma DB persisted successfully.")
+        return True
     
-    # Chroma's 'persist()' method writes the database files to the 
-    # 'persist_directory' specified when the DB was created.
-    # The 'dst_dir' is passed into the initial 'chroma_db' call.
-    db.persist()
-
-    print("Chroma DB persisted successfully.")
+    except Exception as e:
+        print(f"Error while persisting Chroma DB: {e}")
+        return False
