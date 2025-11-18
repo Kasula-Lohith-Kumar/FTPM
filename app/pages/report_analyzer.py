@@ -84,9 +84,6 @@ def run():
 
         # --- If embeddings are generated ---
         if st.session_state.embeddings_generated:
-            st.session_state.start_analysis = False
-            # if not st.session_state.start_analysis:
-            #     st.rerun()
             st.info(f"✅ Using generated embeddings: `{st.session_state.temp_embedding_path}`")
 
             # Download embeddings button
