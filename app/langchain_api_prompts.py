@@ -6,7 +6,7 @@ import tempfile
 import tiktoken
 import config
 import streamlit as st
-import secrets
+import streamlit_secrets
 from openai import OpenAI
 from langchain_openai import ChatOpenAI
 # from langchain_openai import OpenAITextToSpeech
@@ -28,20 +28,20 @@ if "buffer" not in st.session_state:
 # --- Initialize model ---
 llm = ChatOpenAI(
     model="gpt-4.1-mini",
-    api_key=secrets.get_openai_key(),
+    api_key=streamlit_secrets.get_openai_key(),
     temperature=0.7  # adjust as needed
     )
 
 llm_embd = ChatOpenAI(
         model="gpt-4o",
         temperature=0,
-        api_key=secrets.get_openai_key()
+        api_key=streamlit_secrets.get_openai_key()
     )
 
 
-embedding = OpenAIEmbeddings(api_key=secrets.get_openai_key())
+embedding = OpenAIEmbeddings(api_key=streamlit_secrets.get_openai_key())
 
-client = OpenAI(api_key=secrets.get_openai_key())
+client = OpenAI(api_key=streamlit_secrets.get_openai_key())
 
 
 
