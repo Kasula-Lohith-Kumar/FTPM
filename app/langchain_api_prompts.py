@@ -1,7 +1,7 @@
 import os
 import re
 import json
-import faiss
+# import faiss
 import tempfile
 import tiktoken
 import config
@@ -17,7 +17,7 @@ from langchain_community.document_loaders.parsers import OpenAIWhisperParser
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import FAISS
+# from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores import Chroma
 
 
