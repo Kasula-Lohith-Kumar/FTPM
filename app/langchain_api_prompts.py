@@ -350,3 +350,26 @@ def save_chroma_embd(db):
     except Exception as e:
         st.info(f"❌ Error while persisting Chroma DB: {e}")
         return False
+    
+
+def load_chroma_from_zip(zip_file):
+    # Create a temp folder
+    temp_dir = tempfile.mkdtemp()
+
+    # Extract ZIP
+    with zipfile.ZipFile(zip_file, "r") as z:
+        z.extractall(temp_dir)
+
+    # Find extracted folder (first subdir)
+    subdirs = [os.path.join(temp_dir, d) for d in os.listdir(temp_dir)]
+    persist_dir = subdirs[0]     # the actual chroma folder
+
+    embeddings = OpenAIEmbeddings()
+
+    # Load the Chroma DB
+    db = Chroma(
+        embedding_function=embeddings,
+        persist_directory=persist_dir
+    )
+
+    return db
