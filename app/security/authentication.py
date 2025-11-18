@@ -176,7 +176,7 @@ def is_streamlit_cloud() -> bool:
     """Detect Streamlit Cloud by checking if st.secrets has Streamlit-managed credentials."""
     print('GCP Service Account Check ...')
     try:
-        _ = st.secrets["gcp_service_account"]
+        _ = st.Secrets["gcp_service_account"]
         return True
     except Exception:
         return False
