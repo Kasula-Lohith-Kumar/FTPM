@@ -258,7 +258,7 @@ def process_text_data(combined_text):
 def faiss_db(splits):
 
 
-    db = FAISS.from_documents(splits, embedding)
+    db = FAISS.from_documents(splits, llm_embd)
     return db
 
 
@@ -287,7 +287,7 @@ def chroma_db(splits):
 
     db = Chroma.from_documents(
         splits, 
-        embedding,
+        llm_embd,
         persist_directory=embd_path
     )
 
