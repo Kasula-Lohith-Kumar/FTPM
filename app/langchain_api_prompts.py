@@ -6,7 +6,7 @@ import tempfile
 import tiktoken
 import config
 import streamlit as st
-from app import secrets
+import secrets
 from openai import OpenAI
 from langchain_openai import ChatOpenAI
 # from langchain_openai import OpenAITextToSpeech
