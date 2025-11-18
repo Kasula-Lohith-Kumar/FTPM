@@ -67,7 +67,7 @@ def extract_images_and_text_from_pdf(pdf_path):
 
             print(f"Processed {image_filename} on page {page_number + 1}")
 
-    print("Processing complete.")
+    st.info("Combined images and text Processing complete.")
 
     # Return the combined text
     return combined_text

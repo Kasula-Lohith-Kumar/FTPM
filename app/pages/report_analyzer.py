@@ -72,21 +72,16 @@ def run():
                 # embedding_path = generate_embeddings(temp_doc_path)
                 combined_text = dp.extract_images_and_text_from_pdf(temp_doc_path)
                 splits = lap.process_text_data(combined_text)
-                faiss_database = lap.faiss_db(splits)
+                chroma_database = lap.chroma_db(splits)
 
-                embed_path = os.path.join(tempfile.gettempdir(), "embeddings")
+                # embed_path = os.path.join(tempfile.gettempdir(), "embeddings")
 
-                if not os.path.exists(embed_path):
-                    os.makedirs(embed_path, exist_ok=True)
+                # if not os.path.exists(embed_path):
+                #     os.makedirs(embed_path, exist_ok=True)
                 
-                lap.save_embd(faiss_database, embed_path)
-
-                # with open(os.path.join(tempfile.gettempdir(), "data.faiss"), "w") as f:
-                #     f.write(faiss_database)
-
-                st.session_state.embeddings_generated = True
-                st.session_state.temp_embedding_path = embed_path
-                st.success("✅ Embeddings generated successfully!")
+                if lap.save_chroma_embd(chroma_database):
+                    st.session_state.embeddings_generated = True
+                    st.success("✅ Embeddings generated successfully!")
 
         # --- If embeddings are generated ---
         if st.session_state.embeddings_generated:

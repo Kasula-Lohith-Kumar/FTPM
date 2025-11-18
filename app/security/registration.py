@@ -9,7 +9,7 @@ REG_COL_INDEX = 0
 REG_COL_RANGE = 'A1:D1'
 EXPECTED_HEADERS = ['Full_Name', 'Email', 'User_Name', 'Password']
 
-def registration_form():
+def registration_form(): 
     """Displays the registration form."""
 
     print("In function : registration_form")

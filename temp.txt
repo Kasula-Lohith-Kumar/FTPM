@@ -1,0 +1,89 @@
+
+
+Page 1:
+Lohith Kumar Kasula
+Bangalore
++91-8247788145
+Linkedin Github
+kasulalohithkumar@gmail.com
+Skills
+• C, SQL, Tableau, Python, BigQuery, CI/CD, Generative AI, Visual Studio, GitHub, Bitbucket, 
+scikit-learn, Matplotlib, Pandas, JIRA, Linux, AWS, Prompt Engineering, MySQL, Git, Excel, 
+NumPy, PyTorch, SeaBorn, Google Colab, Linux/Unix, postman, GitHub Actions, Docker, 
+Machine Learning, Deep Learning, Core ML, SVM (Support Vector Machine), 
+Natural Language Processing (NLP), EDA, Python Libraries, Statistical Modelling, Flask
+Experience
+Senior Software Engineer
+Nov 2025 - Jun 2024
+HARMAN Connected Services
+Project Responsibilities
+Implemented the RF6 Protocol Stack on TI CC2652 and TI CC1354 chipsets.
+Worked in the Access Point (AP) Team focusing on RF6 system development.
+Developed core RF6 features: Network Formation, ED Enrolment/Deletion, Frequency
+Hopping, Frequency Agility, Child Table Update, and Dynamic Slotting.
+Software Engineer II
+Oct 2021 - May 2023
+Mirafra Techonolgies
+Project: Qualcomm – Automotive IVI (SNPE & QNN)
+Performed automation and validation of ML frameworks for automotive clients (Volvo, Ford,
+Aptiv, Bosch).
+Tested models (TensorFlow, YOLO, LSTM, ResNet, MobileNet) across CPU, GPU, DSP, AIP.
+Conducted sanity, accuracy, performance, and stress testing across Linux, Android/ADB,
+QNX, and hypervisor platforms.
+Reported functional issues, performance drops, accuracy failures, crashes, and hangs.
+Created test cases, playlists, coverage reports, and published results via Axiom.
+Automated tasks like dynamic JSON creation, FPS/performance extraction (openpyxl), and
+fixing automation issues.
+Software Engineer
+Jan 2020 - Oct 2021
+Capgemini engineering
+Project: Scalable Test Automation Framework (STAR) – Intel (Client)
+Performed manual and automated testing on Linux and Windows IoT platforms.
+Automated workflows for hardware flashing, host bring-up, and NVR use-case validation.
+Tested ML models (especially Computer Vision models) as part of IoTG validation.
+Contributed to a reusable automation framework used across multiple Intel IoTG teams and
+platforms.
+Tools used: PyCharm, GitLab, Mobaxterm, WinSCP, VNC Viewer.
+Projects
+1. E-Commerce Operations Analysis Using SQL
+
+
+Page 2:
+https://github.com/Kasula-Lohith-Kumar/ScalerProjects/tree/main/01_SQL
+Analyzed 100k+ e-commerce orders using SQL to extract key operational and customer
+insights.
+Wrote SQL queries to study order trends, shipping efficiency, product attributes, and review
+patterns.
+Created SQL-based summary metrics to evaluate performance and customer satisfaction.
+2. Customer Purchase Behavior Analysis Using Confidence Intervals & CLT
+https://github.com/Kasula-Lohith-Kumar/ScalerProjects/tree/main/04_Confidence_Interval_and_CLT
+Applied Central Limit Theorem concepts to analyze Black Friday spending across customer
+groups.
+Calculated confidence intervals to compare purchase behavior between male and female
+customers.
+Derived statistical insights to support data-driven decision-making for retail strategy.
+3. GenAI Project: LLM-Powered Finance Application
+https://github.com/Kasula-Lohith-Kumar/FTPM
+Built an AI-based finance app with tutoring, automated report analysis, and portfolio insights.
+Used LangChain, OpenAI APIs, LLMs, VectorDB, and deployed via Streamlit.
+Education
+Woolf University
+2025
+MS
+Profile Summary
+Data Science & ML professional with a Master’s degree and end-to-end experience across the
+data lifecycle.
+Proficient in Python, SQL, Tableau, and statistical analysis for data-driven insights.
+Experience in ML, Deep Learning, NLP, Computer Vision, and Generative AI, with
+exposure to MLOps.
+Strong analytical skills with the ability to convert data into actionable business insights.
+Key Skills
+Programming: Python, SQL, Tableau, Excel
+Data Science: Statistics, Data Visualization, Product Analytics
+Machine Learning: Supervised & Unsupervised ML
+AI: Deep Learning, NLP, CV, Generative AI
+Engineering: Data Engineering, MLOps
+Business: Product Thinking, Problem-Solving
+G. Pullaiah College of Engineering and Technology
+2019
+BE/B.Tech/BS

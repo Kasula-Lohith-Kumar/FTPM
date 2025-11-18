@@ -4,6 +4,7 @@ import json
 import faiss
 import tempfile
 import tiktoken
+import config
 import streamlit as st
 from app import secrets
 from openai import OpenAI
@@ -17,6 +18,7 @@ from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores import Chroma
 
 
 # --- Initialize buffer ---
@@ -36,6 +38,8 @@ llm_embd = ChatOpenAI(
         api_key=secrets.get_openai_key()
     )
 
+
+embedding = OpenAIEmbeddings(api_key=secrets.get_openai_key())
 
 client = OpenAI(api_key=secrets.get_openai_key())
 
@@ -253,9 +257,42 @@ def process_text_data(combined_text):
 
 def faiss_db(splits):
 
-    embedding = OpenAIEmbeddings(api_key=secrets.get_openai_key())
 
     db = FAISS.from_documents(splits, embedding)
+    return db
+
+
+
+def chroma_db(splits):
+    """
+    Creates and returns a Chroma vector store from documents using OpenAI embeddings.
+    
+    Args:
+        splits: A list of Document objects (from langchain or similar) to embed and store.
+        
+    Returns:
+        A Chroma vector store object.
+    """
+    # Assuming 'secrets.get_openai_key()' is available and returns the key
+    # In a typical setup, the key might be read from an environment variable automatically
+    # by OpenAIEmbeddings, but we pass it explicitly here for consistency.
+    # Note: Using 'from langchain_openai import OpenAIEmbeddings' is the modern approach.
+
+    # Chroma.from_documents is the direct equivalent of FAISS.from_documents
+
+    embd_path = os.path.join(tempfile.gettempdir(), config.PERSISTANT_PATH)
+
+    if not os.path.exists(embd_path):
+        os.makedirs(embd_path)
+
+    db = Chroma.from_documents(
+        splits, 
+        embedding,
+        persist_directory=embd_path
+    )
+
+    st.session_state.temp_embedding_path = embd_path
+    
     return db
 
 def text_retraivalQA(combined_text, query):
@@ -264,7 +301,7 @@ def text_retraivalQA(combined_text, query):
     text_splits = process_text_data(combined_text)
 
     # Step 2: Build vector DB
-    database = faiss_db(text_splits)
+    database = chroma_db(text_splits)
     retriever = database.as_retriever()
 
     # Step 3: Prompt template
@@ -293,5 +330,23 @@ def text_retraivalQA(combined_text, query):
     return result
 
 def save_embd(db, dst_file):
+    os.makedirs(dst_file, exist_ok=True)
     temp_path = os.path.join(dst_file, 'data.faiss')
-    faiss.write_index(db.index, temp_path)
+    faiss.write_index(db.index, temp_path) 
+
+
+def save_chroma_embd(db):
+    """
+    Persists the Chroma vector store to the specified directory.
+    
+    Args:
+        db: The Chroma vector store object.
+        dst_dir: The destination directory to save the database files.
+    """
+    
+    # Chroma's 'persist()' method writes the database files to the 
+    # 'persist_directory' specified when the DB was created.
+    # The 'dst_dir' is passed into the initial 'chroma_db' call.
+    db.persist()
+
+    print("Chroma DB persisted successfully.")
