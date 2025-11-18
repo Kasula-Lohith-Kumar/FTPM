@@ -286,9 +286,9 @@ def chroma_db(splits):
         os.makedirs(embd_path)
 
     db = Chroma.from_documents(
-        splits, 
-        embedding_function = llm_embd,
-        persist_directory=embd_path
+        documents = splits, 
+        embedding = llm_embd,
+        persist_directory = embd_path
     )
 
     st.session_state.temp_embedding_path = embd_path
