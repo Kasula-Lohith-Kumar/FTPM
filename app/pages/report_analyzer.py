@@ -56,6 +56,9 @@ def run():
 
     # --- FILE UPLOAD SECTION ---
     if upload_mode == "📄 Upload Document":
+        st.session_state.start_analysis = False
+        st.session_state.embeddings_generated = False
+        st.rerun()
         st.write("### Upload Your Document")
         uploaded_doc = st.file_uploader("Upload a PDF, DOCX, or TXT file", type=["pdf", "docx", "txt"])
 
@@ -80,6 +83,8 @@ def run():
 
         # --- If embeddings are generated ---
         if st.session_state.embeddings_generated:
+            st.session_state.start_analysis = False
+            st.rerun()
             st.info(f"✅ Using generated embeddings: `{st.session_state.temp_embedding_path}`")
 
             # Download embeddings button
