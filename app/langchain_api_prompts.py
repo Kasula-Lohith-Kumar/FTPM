@@ -7,6 +7,7 @@ import zipfile
 import tiktoken
 import config
 import streamlit as st
+from pathlib import Path
 import streamlit_secrets
 from openai import OpenAI
 from langchain_openai import ChatOpenAI
@@ -361,14 +362,14 @@ def load_chroma_from_zip(zip_file):
 
     # Find extracted folder (first subdir)
     subdirs = [os.path.join(temp_dir, d) for d in os.listdir(temp_dir)]
-    persist_dir = subdirs[0]     # the actual chroma folder
+    persist_dir =  Path(subdirs[0])     # the actual chroma folder
     # Load the Chroma DB
     db = Chroma(
         embedding_function=llm_embd,
         persist_directory=persist_dir
     )
 
-    st.session_state.temp_embedding_path = persist_dir
+    st.session_state.temp_embedding_path = str(persist_dir)
     st.success(f"✅ Embeddings '{persist_dir.name}' uploaded successfully!")
     st.info("📄 Document upload disabled since embeddings are provided directly.")
     
