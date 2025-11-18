@@ -1,4 +1,5 @@
 import os
+import base64
 import tempfile
 import streamlit as st
 import document_processor as dp
@@ -56,6 +57,7 @@ def run():
         st.session_state.start_analysis = False
         st.session_state.embeddings_generated = False
         st.session_state.chat_history = []
+        combined_text = ''
     st.session_state.upload_mode = upload_mode
 
     # --- FILE UPLOAD SECTION ---
@@ -108,6 +110,8 @@ def run():
         uploaded_embeddings = st.file_uploader("Upload your Chroma DB (.zip)", type=["zip"])
         if uploaded_embeddings:
             db_file = lap.load_chroma_from_zip(uploaded_embeddings)
+            with open(uploaded_embeddings, "rb") as f:
+                combined_text = base64.b64encode(f.read()).decode("utf-8")
 
             if st.button("🚀 Start Analysis"):
                 st.session_state.start_analysis = True
