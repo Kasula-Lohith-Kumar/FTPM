@@ -344,9 +344,9 @@ def save_chroma_embd(db):
     """
     try:
         db.persist()
-        print("Chroma DB persisted successfully.")
+        print("✅ Chroma DB persisted successfully.")
         return True
     
     except Exception as e:
-        print(f"Error while persisting Chroma DB: {e}")
+        print(f"❌ Error while persisting Chroma DB: {e}")
         return False
