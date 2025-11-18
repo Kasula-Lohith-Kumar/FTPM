@@ -182,6 +182,10 @@ def load_key_file_data():
 #     except Exception:
 #         return False
 
-def is_streamlit_cloud() -> bool:
-    """Detect Streamlit Cloud reliably."""
-    return os.environ.get("STREAMLIT_RUNTIME") == "cloud"
+# def is_streamlit_cloud() -> bool:
+#     """Detect Streamlit Cloud reliably."""
+#     return os.environ.get("STREAMLIT_RUNTIME") == "cloud"
+
+def is_streamlit_cloud():
+    return "STREAMLIT_SERVER_HOST" in os.environ and \
+           os.environ["STREAMLIT_SERVER_HOST"].endswith(".streamlit.app")
