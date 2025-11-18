@@ -73,11 +73,6 @@ def run():
                 combined_text = dp.extract_images_and_text_from_pdf(temp_doc_path)
                 splits = lap.process_text_data(combined_text)
                 chroma_database = lap.chroma_db(splits)
-
-                # embed_path = os.path.join(tempfile.gettempdir(), "embeddings")
-
-                # if not os.path.exists(embed_path):
-                #     os.makedirs(embed_path, exist_ok=True)
                 
                 if lap.save_chroma_embd(chroma_database):
                     st.session_state.embeddings_generated = True
@@ -88,7 +83,8 @@ def run():
             st.info(f"✅ Using generated embeddings: `{st.session_state.temp_embedding_path}`")
 
             # Download embeddings button
-            with open(st.session_state.temp_embedding_path, "rb") as file:
+            embd_path = os.path.join(st.session_state.temp_embedding_path, 'chroma.sqlite3')
+            with open(embd_path, "rb") as file:
                 st.download_button(
                     label="💾 Download Embeddings",
                     data=file,
