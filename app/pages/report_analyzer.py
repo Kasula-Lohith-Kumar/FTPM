@@ -83,12 +83,12 @@ def run():
             st.info(f"✅ Using generated embeddings: `{st.session_state.temp_embedding_path}`")
 
             # Download embeddings button
-            embd_path = os.path.join(st.session_state.temp_embedding_path, 'chroma.sqlite3')
-            with open(embd_path, "rb") as file:
+            db_file = os.path.join(st.session_state.temp_embedding_path, 'chroma.sqlite3')
+            with open(db_file, "rb") as file:
                 st.download_button(
                     label="💾 Download Embeddings",
                     data=file,
-                    file_name=os.path.basename(st.session_state.temp_embedding_path),
+                    file_name=db_file,
                     mime="application/octet-stream"
                 )
 
