@@ -58,6 +58,7 @@ def run():
         st.session_state.chat_history = []
         st.session_state.combined_text = ''
         st.session_state.db_file_path = None
+        st.session_state.chroma_database = None
 
     st.session_state.upload_mode = upload_mode
 
@@ -82,9 +83,9 @@ def run():
                 st.session_state.combined_text = \
                     dp.extract_images_and_text_from_pdf(temp_doc_path)
                 splits = lap.process_text_data(st.session_state.combined_text)
-                chroma_database = lap.chroma_db(splits)
+                st.session_state.chroma_database = lap.chroma_db(splits)
                 
-                if lap.save_chroma_embd(chroma_database):
+                if lap.save_chroma_embd(st.session_state.chroma_database):
                     st.session_state.embeddings_generated = True
                     st.success("✅ Embeddings generated successfully!")
 
@@ -111,7 +112,7 @@ def run():
         st.write("### Upload Your Embeddings")
         uploaded_embeddings = st.file_uploader("Upload your Chroma DB (.zip)", type=["zip"])
         if uploaded_embeddings:
-            st.session_state.combined_text = lap.load_chroma_from_zip(uploaded_embeddings)
+            st.session_state.chroma_database = lap.load_chroma_from_zip(uploaded_embeddings)
 
             if st.button("🚀 Start Analysis"):
                 st.session_state.start_analysis = True
@@ -127,7 +128,7 @@ def run():
 
         if user_input:
             # Placeholder chatbot response (replace with your model logic)
-            response = lap.text_retraivalQA(st.session_state.combined_text, user_input).content
+            response = lap.text_retraivalQA(st.session_state.chroma_database, user_input).content
             # response = f"🤖 (Mock Response) The analysis for '{user_input}' will appear here."
             st.session_state.chat_history.append((user_input, response))
 
