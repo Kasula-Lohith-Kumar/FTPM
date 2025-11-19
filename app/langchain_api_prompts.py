@@ -385,7 +385,6 @@ def save_embd(db, dst_file):
 
 def load_chroma_from_zip(zip_file):
     import tempfile, zipfile, os
-    from langchain_community.vectorstores import Chroma
 
     # ----- Extract ZIP -----
     temp_dir = tempfile.mkdtemp()
