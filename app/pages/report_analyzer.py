@@ -1,6 +1,7 @@
 import os
 import tempfile
 import streamlit as st
+import config
 import document_processor as dp
 import langchain_api_prompts as lap
 import shutil
@@ -61,8 +62,9 @@ def run():
         st.session_state.db_file_path = None
         st.session_state.chroma_database = None
 
-        if os.path.exists(st.session_state.temp_embedding_path):
-            shutil.rmtree(st.session_state.temp_embedding_path)
+        embd_path = os.path.join(tempfile.gettempdir(), config.PERSISTANT_PATH)
+        if os.path.exists(embd_path):
+            shutil.rmtree(embd_path)
 
     st.session_state.upload_mode = upload_mode
 
