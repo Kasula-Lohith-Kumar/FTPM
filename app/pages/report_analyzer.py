@@ -62,9 +62,9 @@ def run():
         st.session_state.db_file_path = None
         st.session_state.chroma_database = None
 
-        embd_path = os.path.join(tempfile.gettempdir(), config.PERSISTANT_PATH)
-        if os.path.exists(embd_path):
-            shutil.rmtree(embd_path)
+        # embd_path = os.path.join(tempfile.gettempdir(), config.PERSISTANT_PATH)
+        # if os.path.exists(embd_path):
+        #     shutil.rmtree(embd_path)
 
     st.session_state.upload_mode = upload_mode
 
@@ -86,6 +86,9 @@ def run():
                 # --- PLACE YOUR EMBEDDING LOGIC HERE ---
                 # Example:
                 # embedding_path = generate_embeddings(temp_doc_path)
+                embd_path = os.path.join(tempfile.gettempdir(), config.PERSISTANT_PATH)
+                if os.path.exists(embd_path):
+                    shutil.rmtree(embd_path)
                 st.session_state.combined_text = \
                     dp.extract_images_and_text_from_pdf(temp_doc_path)
                 splits = lap.process_text_data(st.session_state.combined_text)
