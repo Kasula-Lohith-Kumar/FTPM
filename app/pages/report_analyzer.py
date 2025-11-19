@@ -85,23 +85,24 @@ def run():
                 splits = lap.process_text_data(st.session_state.combined_text)
                 st.session_state.chroma_database = lap.chroma_db(splits)
                 
-                if lap.save_chroma_embd(st.session_state.chroma_database):
-                    st.session_state.embeddings_generated = True
-                    st.success("✅ Embeddings generated successfully!")
+                # if lap.save_chroma_embd(st.session_state.chroma_database):
+                #     st.session_state.embeddings_generated = True
+                #     st.success("✅ Embeddings generated successfully!")
 
         # --- If embeddings are generated ---
         if st.session_state.embeddings_generated:
             st.info(f"✅ Using generated embeddings: `{st.session_state.temp_embedding_path}`")
-            lap.zip_chroma_db(persist_dir=st.session_state.temp_embedding_path,
-                              output_zip_path="my_chroma_db_export.zip")
+            # st.session_state.db_file_path = os.path.join(st.session_state.temp_embedding_path, 
+            #                                              'chroma_db_export.zip')
+            
+            zip_file = lap.zip_chroma_db(persist_dir=st.session_state.temp_embedding_path,
+                              output_zip_path='chroma_db_export.zip')
             # Download embeddings button
-            st.session_state.db_file_path = os.path.join(st.session_state.temp_embedding_path, 
-                                                         'my_chroma_db_export.zip')
-            with open(st.session_state.db_file_path, "rb") as file:
+            with open(zip_file, "rb") as file:
                 st.download_button(
                     label="💾 Download Embeddings",
                     data=file,
-                    file_name=st.session_state.db_file_path,
+                    file_name=zip_file,
                     mime="application/octet-stream"
                 )
 

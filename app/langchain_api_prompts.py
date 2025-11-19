@@ -291,6 +291,15 @@ def chroma_db(splits):
         persist_directory = embd_path
     )
 
+    try:
+        db.persist()
+        st.success("✅ Embeddings generated successfully!")
+        st.info("✅ Chroma DB persisted successfully.")
+        st.session_state.embeddings_generated = True
+    
+    except Exception as e:
+        st.info(f"❌ Error while persisting Chroma DB: {e}")
+
     st.session_state.temp_embedding_path = embd_path
     
     return db
@@ -338,21 +347,6 @@ def save_embd(db, dst_file):
     faiss.write_index(db.index, temp_path) 
 
 
-def save_chroma_embd(db):
-    """
-    Persists the Chroma vector store to disk.
-    Returns:
-        True  -> if persist succeeds
-        False -> if persist fails
-    """
-    try:
-        db.persist()
-        st.info("✅ Chroma DB persisted successfully.")
-        return True
-    
-    except Exception as e:
-        st.info(f"❌ Error while persisting Chroma DB: {e}")
-        return False
     
 
 # def load_chroma_from_zip(zip_file):
