@@ -441,11 +441,11 @@ def load_chroma_from_zip(zip_file):
 def zip_chroma_db(persist_dir, output_zip_path):
     # persist_dir = Path(persist_dir)
 
-    st.info("DEBUG persist_dir:", persist_dir)
-    st.info("DEBUG contents:", os.listdir(persist_dir))
+    st.info(f"DEBUG persist_dir: {persist_dir}")
+    st.info(f"DEBUG contents: {os.listdir(persist_dir)}")
 
-    st.info("DEBUG index exists:", (persist_dir / "index").exists())
-    st.info("DEBUG collections exists:", (persist_dir / "collections").exists())
+    st.info(f"DEBUG index exists: {(persist_dir / "index").exists()}")
+    st.info(f"DEBUG collections exists: {(persist_dir / "collections").exists()}")
 
     if not persist_dir.exists():
         raise FileNotFoundError(f"Persist directory not found: {persist_dir}")
