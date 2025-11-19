@@ -88,8 +88,9 @@ def run():
                 # embedding_path = generate_embeddings(temp_doc_path)
                 # Delete the collection before creating a new one
                 if 'chroma_database' in st.session_state:
-                    st.session_state.chroma_database.delete_collection() 
-                    del st.session_state.chroma_database
+                    if st.session_state.chroma_database != None:
+                        st.session_state.chroma_database.delete_collection() 
+                        del st.session_state.chroma_database
                 st.session_state.embeddings_generated = False
                 embd_path = os.path.join(tempfile.gettempdir(), config.PERSISTANT_PATH)
                 if os.path.exists(embd_path):
