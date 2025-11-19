@@ -287,7 +287,7 @@ def chroma_db(splits):
 
     db = Chroma.from_documents(
         documents = splits, 
-        embedding_function = llm_embd,
+        embedding = llm_embd,
         persist_directory = embd_path
     )
 
