@@ -441,42 +441,28 @@ def load_chroma_from_zip(zip_file):
 def zip_chroma_db(persist_dir, output_zip_path):
     persist_dir = Path(persist_dir)
 
-    st.info(f"DEBUG persist_dir: {persist_dir}")
-    st.info(f"DEBUG contents: {os.listdir(persist_dir)}")
-
-    st.info(f"DEBUG index exists: {os.path.join(persist_dir , 'index').exists()}")
-    st.info(f"DEBUG collections exists: {os.path.join(persist_dir , 'collections').exists()}")
-
-
     if not persist_dir.exists():
         raise FileNotFoundError(f"Persist directory not found: {persist_dir}")
 
-    # Validate Chroma structure (modern format)
-    sqlite_files = [f for f in os.listdir(persist_dir) if f.endswith(".sqlite3")]
-    parquet_collections = (persist_dir / "chroma-collections.parquet").exists()
-    parquet_embeddings = (persist_dir / "chroma-embeddings.parquet").exists()
-    index_dir = (persist_dir / "index").exists()
+    # --- List contents ---
+    files = [f for f in os.listdir(persist_dir) if f.endswith(".sqlite3")]
+    dirs = [d for d in os.listdir(persist_dir) if (persist_dir / d).is_dir()]
 
-    if not sqlite_files:
-        raise FileNotFoundError("No .sqlite3 file found in persist directory.")
+    # --- Validate ---
+    if not files:
+        raise FileNotFoundError("❌ No .sqlite3 database found in persist directory.")
 
-    if not parquet_collections or not parquet_embeddings:
+    if len(dirs) == 0:
         raise FileNotFoundError(
-            "Missing chroma parquet files. Expected:\n"
-            "- chroma-collections.parquet\n"
-            "- chroma-embeddings.parquet"
+            "❌ Chroma directory incomplete — expected at least one collection folder."
         )
 
-    if not index_dir:
-        raise FileNotFoundError("Missing Chroma `index/` folder.")
-
-    # Create ZIP
+    # --- Create ZIP ---
     with zipfile.ZipFile(output_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-        for root, dirs, files in os.walk(persist_dir):
-            for file in files:
+        for root, _dirs, file_list in os.walk(persist_dir):
+            for file in file_list:
                 file_path = os.path.join(root, file)
                 arcname = os.path.relpath(file_path, persist_dir)
                 zipf.write(file_path, arcname)
 
-    print(f"Successfully created ZIP: {output_zip_path}")
     return output_zip_path
