@@ -86,6 +86,7 @@ def run():
                 # --- PLACE YOUR EMBEDDING LOGIC HERE ---
                 # Example:
                 # embedding_path = generate_embeddings(temp_doc_path)
+                st.session_state.embeddings_generated = False
                 embd_path = os.path.join(tempfile.gettempdir(), config.PERSISTANT_PATH)
                 if os.path.exists(embd_path):
                     shutil.rmtree(embd_path)
