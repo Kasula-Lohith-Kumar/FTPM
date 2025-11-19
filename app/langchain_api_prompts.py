@@ -439,7 +439,7 @@ def load_chroma_from_zip(zip_file):
     return combined_text, db
 
 def zip_chroma_db(persist_dir, output_zip_path):
-    # persist_dir = Path(persist_dir)
+    persist_dir = Path(persist_dir)
 
     st.info(f"DEBUG persist_dir: {persist_dir}")
     st.info(f"DEBUG contents: {os.listdir(persist_dir)}")
