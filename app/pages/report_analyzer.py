@@ -57,6 +57,7 @@ def run():
         st.session_state.embeddings_generated = False
         st.session_state.chat_history = []
         combined_text = ''
+        db_file = None
     st.session_state.upload_mode = upload_mode
 
     # --- FILE UPLOAD SECTION ---
@@ -124,7 +125,7 @@ def run():
 
         if user_input:
             # Placeholder chatbot response (replace with your model logic)
-            response = lap.text_retraivalQA(db_file, user_input).content
+            response = lap.text_retraivalQA(combined_text, user_input).content
             # response = f"🤖 (Mock Response) The analysis for '{user_input}' will appear here."
             st.session_state.chat_history.append((user_input, response))
 

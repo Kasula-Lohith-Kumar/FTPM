@@ -369,11 +369,11 @@ def load_chroma_from_zip(zip_file):
     file = dp.list_dir_content(persist_dir)
 
     if file:
-        st.info(f"Loading file : {file}....")
+        st.info(f"Found file : {file}, Loading....")
         try:
             with open(os.path.join(str(persist_dir),file), "rb") as f:
                 combined_text = base64.b64encode(f.read()).decode("utf-8")
-                st.success(f"✅ File : {file} Loaded Sucessfully!!!")
+                st.success(f"✅ File : {file} Loaded Successfully!")
         except Exception as e:
             st.error(f"❌Failed to load file : {file} with exception {e}")
 
