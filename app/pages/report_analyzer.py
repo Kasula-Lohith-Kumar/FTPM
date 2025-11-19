@@ -3,6 +3,7 @@ import tempfile
 import streamlit as st
 import document_processor as dp
 import langchain_api_prompts as lap
+import shutil
 
 def run():
     # --- HIDE DEFAULT SIDEBAR ---
@@ -59,6 +60,9 @@ def run():
         st.session_state.combined_text = ''
         st.session_state.db_file_path = None
         st.session_state.chroma_database = None
+
+        if os.path.exists(st.session_state.temp_embedding_path):
+            shutil.rmtree(st.session_state.temp_embedding_path)
 
     st.session_state.upload_mode = upload_mode
 
