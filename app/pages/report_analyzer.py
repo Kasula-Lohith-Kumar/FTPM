@@ -92,9 +92,11 @@ def run():
         # --- If embeddings are generated ---
         if st.session_state.embeddings_generated:
             st.info(f"✅ Using generated embeddings: `{st.session_state.temp_embedding_path}`")
-
+            lap.zip_chroma_db(persist_dir=st.session_state.temp_embedding_path,
+                              output_zip_path="my_chroma_db_export.zip")
             # Download embeddings button
-            st.session_state.db_file_path = os.path.join(st.session_state.temp_embedding_path, 'chroma.sqlite3')
+            st.session_state.db_file_path = os.path.join(st.session_state.temp_embedding_path, 
+                                                         'my_chroma_db_export.zip')
             with open(st.session_state.db_file_path, "rb") as file:
                 st.download_button(
                     label="💾 Download Embeddings",

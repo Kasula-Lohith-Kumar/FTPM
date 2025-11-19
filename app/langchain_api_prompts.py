@@ -407,7 +407,7 @@ def load_chroma_from_zip(zip_file):
         if os.path.isdir(os.path.join(temp_dir, d))
     ]
 
-    persist_dir = None
+    st.session_state.temp_embedding_path = None
 
     # Look for ANY file ending with .sqlite3
     for d in dirs:
@@ -420,24 +420,58 @@ def load_chroma_from_zip(zip_file):
             has_collections = os.path.isdir(os.path.join(d, "collections"))
 
             if has_index and has_collections:
-                persist_dir = d
+                st.session_state.temp_embedding_path = d
                 break
 
-    if persist_dir is None:
+    if st.session_state.temp_embedding_path is None:
         raise FileNotFoundError(
             "No valid Chroma persist directory found (.sqlite3 + index + collections)."
         )
 
-    st.info(f"Using persist_dir: {persist_dir}")
+    st.info(f"Using persist_dir: {st.session_state.temp_embedding_path}")
 
     # Load embeddings
     embeddings = OpenAIEmbeddings(api_key=streamlit_secrets.get_openai_key())
 
     # Load Chroma DB
     db = Chroma(
-        persist_directory=persist_dir,
+        persist_directory=st.session_state.temp_embedding_path,
         embedding_function=embeddings
     )
 
     combined_text = None
     return combined_text, db
+
+def zip_chroma_db(persist_dir, output_zip_path):
+    persist_dir = Path(persist_dir)
+
+    if not persist_dir.exists():
+        raise FileNotFoundError(f"Persist directory not found: {persist_dir}")
+
+    # Validate Chroma structure
+    sqlite_files = [f for f in os.listdir(persist_dir) if f.endswith(".sqlite3")]
+    index_dir = (persist_dir / "index").exists()
+    collections_dir = (persist_dir / "collections").exists()
+
+    if not sqlite_files:
+        raise FileNotFoundError("No .sqlite3 file found in persist directory.")
+
+    if not index_dir or not collections_dir:
+        raise FileNotFoundError(
+            "Chroma directory incomplete. It must include:\n"
+            "- .sqlite3 file\n"
+            "- index/\n"
+            "- collections/"
+        )
+
+    # Create ZIP
+    with zipfile.ZipFile(output_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+        for root, dirs, files in os.walk(persist_dir):
+            for file in files:
+                file_path = os.path.join(root, file)
+                arcname = os.path.relpath(file_path, persist_dir)
+                zipf.write(file_path, arcname)
+
+    print(f"Successfully created ZIP: {output_zip_path}")
+
+    return output_zip_path
