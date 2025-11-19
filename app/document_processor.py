@@ -106,21 +106,21 @@ def display_content(result):
 
 def list_dir_content(path):
     # st.title("List Directory Contents (os.listdir)")
-    if st.button("List Files"):
+    # if st.button("List Files"):
         # 1. Get the list of files/directories in the current working directory
-        try:
-            file_list = os.listdir(path) # '.' represents the current directory
+    try:
+        file_list = os.listdir(path) # '.' represents the current directory
             
-            # 2. Display the result, optionally as a table
-            st.success("Found the following items:")
+        # 2. Display the result, optionally as a table
+        st.success("Found the following items:")
             
-            # Create a simple DataFrame for a nice Streamlit table display
-            df = pd.DataFrame(file_list, columns=['Item Name'])
-            st.dataframe(df)
+        # Create a simple DataFrame for a nice Streamlit table display
+        df = pd.DataFrame(file_list, columns=['Item Name'])
+        st.dataframe(df)
             
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
         
-        st.info(file_list)
-
-        return file_list
+    for file in file_list:
+        if file.endswith('.sqlite3'):
+            return file

@@ -366,8 +366,11 @@ def load_chroma_from_zip(zip_file):
     persist_dir =  Path(subdirs[0])     # the actual chroma folder
     # Load the Chroma DB
     st.info(f'persist_dir : {str(persist_dir)}')
-    file_list = dp.list_dir_content(persist_dir)
-    with open(os.path.join(str(persist_dir),file_list[0]), "rb") as f:
+    file = dp.list_dir_content(persist_dir)
+    
+    if file:
+        st.info("✅ file {file} exists.")
+        with open(os.path.join(str(persist_dir),file), "rb") as f:
                 combined_text = base64.b64encode(f.read()).decode("utf-8")
 
     db = Chroma(
