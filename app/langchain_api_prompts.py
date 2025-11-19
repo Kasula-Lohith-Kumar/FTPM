@@ -378,7 +378,7 @@ def load_chroma_from_zip(zip_file):
             st.error(f"❌Failed to load file : {file} with exception {e}")
 
 
-    db = Chroma(
+    Chroma(
         embedding_function=llm_embd,
         persist_directory=str(persist_dir)
     )
@@ -387,4 +387,4 @@ def load_chroma_from_zip(zip_file):
     st.success(f"✅ Embeddings '{persist_dir.name}' uploaded successfully!")
     st.info("📄 Document upload disabled since embeddings are provided directly.")
     
-    return combined_text, db
+    return combined_text

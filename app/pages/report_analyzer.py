@@ -57,7 +57,8 @@ def run():
         st.session_state.embeddings_generated = False
         st.session_state.chat_history = []
         st.session_state.combined_text = ''
-        st.session_state.db_file = None
+        st.session_state.db_file_path = None
+
     st.session_state.upload_mode = upload_mode
 
     # --- FILE UPLOAD SECTION ---
@@ -92,12 +93,12 @@ def run():
             st.info(f"✅ Using generated embeddings: `{st.session_state.temp_embedding_path}`")
 
             # Download embeddings button
-            st.session_state.db_file = os.path.join(st.session_state.temp_embedding_path, 'chroma.sqlite3')
-            with open(st.session_state.db_file, "rb") as file:
+            st.session_state.db_file_path = os.path.join(st.session_state.temp_embedding_path, 'chroma.sqlite3')
+            with open(st.session_state.db_file_path, "rb") as file:
                 st.download_button(
                     label="💾 Download Embeddings",
                     data=file,
-                    file_name=file,
+                    file_name=st.session_state.db_file_path,
                     mime="application/octet-stream"
                 )
 
@@ -110,8 +111,7 @@ def run():
         st.write("### Upload Your Embeddings")
         uploaded_embeddings = st.file_uploader("Upload your Chroma DB (.zip)", type=["zip"])
         if uploaded_embeddings:
-            st.session_state.combined_text, st.session_state.db_file = \
-            lap.load_chroma_from_zip(uploaded_embeddings)
+            st.session_state.combined_text = lap.load_chroma_from_zip(uploaded_embeddings)
 
             if st.button("🚀 Start Analysis"):
                 st.session_state.start_analysis = True
@@ -127,7 +127,7 @@ def run():
 
         if user_input:
             # Placeholder chatbot response (replace with your model logic)
-            response = lap.text_retraivalQA(combined_text, user_input).content
+            response = lap.text_retraivalQA(st.session_state.combined_text, user_input).content
             # response = f"🤖 (Mock Response) The analysis for '{user_input}' will appear here."
             st.session_state.chat_history.append((user_input, response))
 
