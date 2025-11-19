@@ -385,58 +385,46 @@ def save_embd(db, dst_file):
 #     return db_file
 
 def load_chroma_from_zip(zip_file):
+    import tempfile, zipfile, os
+    from langchain_community.vectorstores import Chroma
 
-    # Create temporary directory
+    # ----- Extract ZIP -----
     temp_dir = tempfile.mkdtemp()
-
-    # Extract ZIP
     with zipfile.ZipFile(zip_file, "r") as z:
         z.extractall(temp_dir)
-    
-    st.write("DEBUG: Extracted root:", temp_dir)
-    for root, dirs, files in os.walk(temp_dir):
-        st.write("DIR:", root)
-        st.write("  Subdirs:", dirs)
-        st.write("  Files:", files)
 
-    # Scan all subdirectories
-    dirs = [
-        os.path.join(temp_dir, d)
-        for d in os.listdir(temp_dir)
-        if os.path.isdir(os.path.join(temp_dir, d))
-    ]
+    st.write("DEBUG: Extracted to:", temp_dir)
 
-    st.session_state.temp_embedding_path = None
-
-    # Look for ANY file ending with .sqlite3
-    for d in dirs:
-        contents = os.listdir(d)
-        sqlite_files = [f for f in contents if f.endswith(".sqlite3")]
-
-        if sqlite_files:
-            # Check Chroma required structure
-            has_index = os.path.isdir(os.path.join(d, "index"))
-            has_collections = os.path.isdir(os.path.join(d, "collections"))
-
-            if has_index and has_collections:
-                st.session_state.temp_embedding_path = d
-                break
-
-    if st.session_state.temp_embedding_path is None:
-        raise FileNotFoundError(
-            "No valid Chroma persist directory found (.sqlite3 + index + collections)."
+    # ----- Recursively search for valid Chroma directory -----
+    def is_chroma_dir(path):
+        return (
+            os.path.isfile(os.path.join(path, "chroma.sqlite3")) and
+            os.path.isdir(os.path.join(path, "index")) and
+            os.path.isdir(os.path.join(path, "collections"))
         )
 
-    st.info(f"Using persist_dir: {st.session_state.temp_embedding_path}")
+    chroma_paths = []
+    for root, dirs, files in os.walk(temp_dir):
+        if is_chroma_dir(root):
+            chroma_paths.append(root)
 
-    # Load Chroma DB
+    if not chroma_paths:
+        raise FileNotFoundError(
+            "❌ No valid Chroma DB found. Expected chroma.sqlite3 + index/ + collections/"
+        )
+
+    # Pick first match (usually only one)
+    persist_dir = chroma_paths[0]
+
+    st.success(f"Found valid Chroma DB: {persist_dir}")
+
+    # ----- Load Chroma DB -----
     db = Chroma(
-        persist_directory=st.session_state.temp_embedding_path,
+        persist_directory=persist_dir,
         embedding_function=llm_embd
     )
 
-    combined_text = None
-    return combined_text, db
+    return None, db
 
 def zip_chroma_db(persist_dir, output_zip_path):
     persist_dir = Path(persist_dir)
