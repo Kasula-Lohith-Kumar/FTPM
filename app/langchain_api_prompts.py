@@ -385,44 +385,70 @@ def save_embd(db, dst_file):
 
 def load_chroma_from_zip(zip_file):
     import tempfile, zipfile, os
+    import streamlit as st
 
-    # ----- Extract ZIP -----
-    temp_dir = tempfile.mkdtemp()
+    # -------------------------
+    # Extract ZIP safely
+    # -------------------------
+    temp_dir = tempfile.TemporaryDirectory()
+    extract_path = temp_dir.name
+
     with zipfile.ZipFile(zip_file, "r") as z:
-        z.extractall(temp_dir)
+        z.extractall(extract_path)
 
-    st.write("DEBUG: Extracted to:", temp_dir)
+    st.write("DEBUG: Extracted files to:", extract_path)
 
-    # ----- Recursively search for valid Chroma directory -----
+    # -------------------------
+    # Helper: check Chroma structure
+    # -------------------------
     def is_chroma_dir(path):
-        return (
-            os.path.isfile(os.path.join(path, "chroma.sqlite3")) and
-            os.path.isdir(os.path.join(path, "index")) and
-            os.path.isdir(os.path.join(path, "collections"))
-        )
+        sqlite_ok = os.path.isfile(os.path.join(path, "chroma.sqlite3"))
 
-    chroma_paths = []
-    for root, dirs, files in os.walk(temp_dir):
+        # index folder may be inside hashed subfolders
+        index_exists = False
+        collections_exists = False
+
+        for root, dirs, files in os.walk(path):
+            if "index" in dirs:
+                index_exists = True
+            if "collections" in dirs:
+                collections_exists = True
+
+        return sqlite_ok and index_exists
+
+    # -------------------------
+    # Search for Chroma DB recursively
+    # -------------------------
+    found_dirs = []
+    for root, dirs, files in os.walk(extract_path):
         if is_chroma_dir(root):
-            chroma_paths.append(root)
+            found_dirs.append(root)
 
-    if not chroma_paths:
+    if not found_dirs:
         raise FileNotFoundError(
-            "❌ No valid Chroma DB found. Expected chroma.sqlite3 + index/ + collections/"
+            "❌ No valid Chroma DB found. Expected at least:\n"
+            "  • chroma.sqlite3\n"
+            "  • index/ (can be nested)\n"
         )
 
-    # Pick first match (usually only one)
-    persist_dir = chroma_paths[0]
+    persist_dir = found_dirs[0]
+    st.success(f"Found valid Chroma DB at:\n{persist_dir}")
 
-    st.success(f"Found valid Chroma DB: {persist_dir}")
+    # -------------------------
+    # Load Chroma
+    # -------------------------
+    try:
+        db = Chroma(
+            persist_directory=persist_dir,
+            embedding_function=llm_embd
+        )
+        st.success("✅ Chroma DB loaded successfully!")
+        return None, db
 
-    # ----- Load Chroma DB -----
-    db = Chroma(
-        persist_directory=persist_dir,
-        embedding_function=llm_embd
-    )
-
-    return None, db
+    except Exception as e:
+        st.error("❌ Failed to load Chroma DB")
+        st.exception(e)
+        return None, None
 
 def zip_chroma_db(persist_dir, output_zip_path):
     persist_dir = Path(persist_dir)
