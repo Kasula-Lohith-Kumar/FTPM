@@ -422,12 +422,12 @@ def load_chroma_from_zip(zip_file):
             embedding_function=llm_embd
         )
         st.success("Chroma DB loaded successfully!")
-        return None, db
+        return db
 
     except Exception as e:
         st.error("Chroma load failed")
         st.exception(e)
-        return None, None
+        return None
 
 def zip_chroma_db(persist_dir, output_zip_path):
     persist_dir = Path(persist_dir)
