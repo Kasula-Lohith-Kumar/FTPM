@@ -3,6 +3,7 @@ import re
 import json
 import base64
 # import faiss
+import shutil
 import tempfile
 import zipfile
 import config
@@ -292,6 +293,9 @@ def chroma_db(splits):
     )
 
     try:
+        if os.path.exists(embd_path):
+            shutil.rmtree(embd_path)   # 👈 clean old content
+        os.makedirs(embd_path)
         db.persist()
         st.success("✅ Embeddings generated successfully!")
         st.info("✅ Chroma DB persisted successfully.")
