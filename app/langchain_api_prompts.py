@@ -22,6 +22,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 # from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores import Chroma
+import document_processor as dp
 
 
 # --- Initialize buffer ---
@@ -365,6 +366,7 @@ def load_chroma_from_zip(zip_file):
     persist_dir =  Path(subdirs[0])     # the actual chroma folder
     # Load the Chroma DB
     st.info(f'persist_dir : {str(persist_dir)}')
+    dp.list_dir_content(persist_dir)
     with open(os.path.join(str(persist_dir),'chroma.sqlite3'), "rb") as f:
                 combined_text = base64.b64encode(f.read()).decode("utf-8")
 
