@@ -393,6 +393,12 @@ def load_chroma_from_zip(zip_file):
     # Extract ZIP
     with zipfile.ZipFile(zip_file, "r") as z:
         z.extractall(temp_dir)
+    
+    st.write("DEBUG: Extracted root:", temp_dir)
+    for root, dirs, files in os.walk(temp_dir):
+        st.write("DIR:", root)
+        st.write("  Subdirs:", dirs)
+        st.write("  Files:", files)
 
     # Scan all subdirectories
     dirs = [
