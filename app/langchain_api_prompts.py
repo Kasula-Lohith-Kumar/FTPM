@@ -369,9 +369,14 @@ def load_chroma_from_zip(zip_file):
     file = dp.list_dir_content(persist_dir)
 
     if file:
-        st.info(f"✅ file {file} exists.")
-        with open(os.path.join(str(persist_dir),file), "rb") as f:
+        st.info(f"Loading file : {file}....")
+        try:
+            with open(os.path.join(str(persist_dir),file), "rb") as f:
                 combined_text = base64.b64encode(f.read()).decode("utf-8")
+                st.sucess(f"✅ File : {file} Loaded Sucessfully!!!")
+        except Exception as e:
+            st.error(f"❌Failed to load file : {file}")
+
 
     db = Chroma(
         embedding_function=llm_embd,
