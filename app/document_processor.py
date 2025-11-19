@@ -120,5 +120,7 @@ def list_dir_content(path):
             
         except Exception as e:
             st.error(f"An error occurred: {e}")
+        
+        st.info(file_list)
 
         return file_list
