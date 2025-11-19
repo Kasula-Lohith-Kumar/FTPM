@@ -287,8 +287,7 @@ def chroma_db(splits):
     #     os.makedirs(embd_path)
 
     if os.path.exists(embd_path):
-        shutil.rmtree(embd_path)   # 👈 clean old content
-    os.makedirs(embd_path)
+        shutil.rmtree(embd_path)
 
     db = Chroma.from_documents(
         documents = splits, 
