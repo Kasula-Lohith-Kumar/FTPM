@@ -364,7 +364,7 @@ def load_chroma_from_zip(zip_file):
     subdirs = [os.path.join(temp_dir, d) for d in os.listdir(temp_dir)]
     persist_dir =  Path(subdirs[0])     # the actual chroma folder
     # Load the Chroma DB
-
+    st.info(f'persist_dir : {str(persist_dir)}')
     with open(os.path.join(str(persist_dir),'chroma.sqlite3'), "rb") as f:
                 combined_text = base64.b64encode(f.read()).decode("utf-8")
 
