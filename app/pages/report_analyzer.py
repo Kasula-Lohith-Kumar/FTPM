@@ -94,7 +94,6 @@ def run():
             st.info(f"✅ Using generated embeddings: `{st.session_state.temp_embedding_path}`")
             # st.session_state.db_file_path = os.path.join(st.session_state.temp_embedding_path, 
             #                                              'chroma_db_export.zip')
-            
             zip_file = lap.zip_chroma_db(persist_dir=st.session_state.temp_embedding_path,
                               output_zip_path='chroma_db_export.zip')
             # Download embeddings button
@@ -115,9 +114,7 @@ def run():
         st.write("### Upload Your Embeddings")
         uploaded_embeddings = st.file_uploader("Upload your Chroma DB (.zip)", type=["zip"])
         if uploaded_embeddings:
-            st.session_state.combined_text, st.session_state.chroma_database \
-                = lap.load_chroma_from_zip(uploaded_embeddings)
-
+            st.session_state.chroma_database = lap.load_chroma_from_zip(uploaded_embeddings)
             if st.button("🚀 Start Analysis"):
                 st.session_state.start_analysis = True
 
