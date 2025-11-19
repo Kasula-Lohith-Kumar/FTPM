@@ -4,6 +4,7 @@ import cv2
 import fitz
 import base64
 import config
+import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
 import langchain_api_prompts as lap
@@ -102,3 +103,21 @@ def display_content(result):
         image_path = os.path.join(image_folder_path, image_file)
         print(f"Displaying {image_file}...")
         display_image(image_path)
+
+def list_dir_content(path):
+    st.title("List Directory Contents (os.listdir)")
+
+    if st.button("List Files"):
+        # 1. Get the list of files/directories in the current working directory
+        try:
+            file_list = os.listdir(path) # '.' represents the current directory
+            
+            # 2. Display the result, optionally as a table
+            st.success("Found the following items:")
+            
+            # Create a simple DataFrame for a nice Streamlit table display
+            df = pd.DataFrame(file_list, columns=['Item Name'])
+            st.dataframe(df)
+            
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
