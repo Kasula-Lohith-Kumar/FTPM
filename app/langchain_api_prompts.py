@@ -424,13 +424,10 @@ def load_chroma_from_zip(zip_file):
 
     st.info(f"Using persist_dir: {st.session_state.temp_embedding_path}")
 
-    # Load embeddings
-    embeddings = OpenAIEmbeddings(api_key=streamlit_secrets.get_openai_key())
-
     # Load Chroma DB
     db = Chroma(
         persist_directory=st.session_state.temp_embedding_path,
-        embedding_function=embeddings
+        embedding_function=llm_embd
     )
 
     combined_text = None
