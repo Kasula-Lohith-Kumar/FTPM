@@ -444,21 +444,24 @@ def zip_chroma_db(persist_dir, output_zip_path):
     if not persist_dir.exists():
         raise FileNotFoundError(f"Persist directory not found: {persist_dir}")
 
-    # Validate Chroma structure
+    # Validate Chroma structure (modern format)
     sqlite_files = [f for f in os.listdir(persist_dir) if f.endswith(".sqlite3")]
+    parquet_collections = (persist_dir / "chroma-collections.parquet").exists()
+    parquet_embeddings = (persist_dir / "chroma-embeddings.parquet").exists()
     index_dir = (persist_dir / "index").exists()
-    collections_dir = (persist_dir / "collections").exists()
 
     if not sqlite_files:
         raise FileNotFoundError("No .sqlite3 file found in persist directory.")
 
-    if not index_dir or not collections_dir:
+    if not parquet_collections or not parquet_embeddings:
         raise FileNotFoundError(
-            "Chroma directory incomplete. It must include:\n"
-            "- .sqlite3 file\n"
-            "- index/\n"
-            "- collections/"
+            "Missing chroma parquet files. Expected:\n"
+            "- chroma-collections.parquet\n"
+            "- chroma-embeddings.parquet"
         )
+
+    if not index_dir:
+        raise FileNotFoundError("Missing Chroma `index/` folder.")
 
     # Create ZIP
     with zipfile.ZipFile(output_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
@@ -469,5 +472,4 @@ def zip_chroma_db(persist_dir, output_zip_path):
                 zipf.write(file_path, arcname)
 
     print(f"Successfully created ZIP: {output_zip_path}")
-
     return output_zip_path
