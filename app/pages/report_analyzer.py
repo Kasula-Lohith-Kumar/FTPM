@@ -56,8 +56,8 @@ def run():
         st.session_state.start_analysis = False
         st.session_state.embeddings_generated = False
         st.session_state.chat_history = []
-        combined_text = ''
-        db_file = None
+        st.session_state.combined_text = ''
+        st.session_state.db_file = None
     st.session_state.upload_mode = upload_mode
 
     # --- FILE UPLOAD SECTION ---
@@ -78,8 +78,9 @@ def run():
                 # --- PLACE YOUR EMBEDDING LOGIC HERE ---
                 # Example:
                 # embedding_path = generate_embeddings(temp_doc_path)
-                combined_text = dp.extract_images_and_text_from_pdf(temp_doc_path)
-                splits = lap.process_text_data(combined_text)
+                st.session_state.combined_text = \
+                    dp.extract_images_and_text_from_pdf(temp_doc_path)
+                splits = lap.process_text_data(st.session_state.combined_text)
                 chroma_database = lap.chroma_db(splits)
                 
                 if lap.save_chroma_embd(chroma_database):
@@ -91,12 +92,12 @@ def run():
             st.info(f"✅ Using generated embeddings: `{st.session_state.temp_embedding_path}`")
 
             # Download embeddings button
-            db_file = os.path.join(st.session_state.temp_embedding_path, 'chroma.sqlite3')
-            with open(db_file, "rb") as file:
+            st.session_state.db_file = os.path.join(st.session_state.temp_embedding_path, 'chroma.sqlite3')
+            with open(st.session_state.db_file, "rb") as file:
                 st.download_button(
                     label="💾 Download Embeddings",
                     data=file,
-                    file_name=db_file,
+                    file_name=file,
                     mime="application/octet-stream"
                 )
 
@@ -109,7 +110,8 @@ def run():
         st.write("### Upload Your Embeddings")
         uploaded_embeddings = st.file_uploader("Upload your Chroma DB (.zip)", type=["zip"])
         if uploaded_embeddings:
-            combined_text, db_file = lap.load_chroma_from_zip(uploaded_embeddings)
+            st.session_state.combined_text, st.session_state.db_file = \
+            lap.load_chroma_from_zip(uploaded_embeddings)
 
             if st.button("🚀 Start Analysis"):
                 st.session_state.start_analysis = True
