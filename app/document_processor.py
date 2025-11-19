@@ -105,8 +105,8 @@ def display_content(result):
         display_image(image_path)
 
 def list_dir_content(path):
-    st.title("List Directory Contents (os.listdir)")
-
+    # st.title("List Directory Contents (os.listdir)")
+    file_list = None
     if st.button("List Files"):
         # 1. Get the list of files/directories in the current working directory
         try:
@@ -121,3 +121,5 @@ def list_dir_content(path):
             
         except Exception as e:
             st.error(f"An error occurred: {e}")
+
+    return file_list
