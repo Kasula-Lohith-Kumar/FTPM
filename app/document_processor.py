@@ -121,4 +121,4 @@ def list_dir_content(path):
         except Exception as e:
             st.error(f"An error occurred: {e}")
 
-    return file_list
+        return file_list
