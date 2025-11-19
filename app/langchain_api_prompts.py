@@ -283,7 +283,11 @@ def chroma_db(splits):
 
     embd_path = os.path.join(tempfile.gettempdir(), config.PERSISTANT_PATH)
 
-    if not os.path.exists(embd_path):
+    # if not os.path.exists(embd_path):
+    #     os.makedirs(embd_path)
+
+    if os.path.exists(embd_path):
+        shutil.rmtree(embd_path)   # 👈 clean old content
         os.makedirs(embd_path)
 
     db = Chroma.from_documents(
@@ -293,9 +297,6 @@ def chroma_db(splits):
     )
 
     try:
-        if os.path.exists(embd_path):
-            shutil.rmtree(embd_path)   # 👈 clean old content
-        os.makedirs(embd_path)
         db.persist()
         st.success("✅ Embeddings generated successfully!")
         st.info("✅ Chroma DB persisted successfully.")
