@@ -5,7 +5,6 @@ import base64
 # import faiss
 import tempfile
 import zipfile
-import tiktoken
 import config
 import streamlit as st
 from pathlib import Path
@@ -356,32 +355,83 @@ def save_chroma_embd(db):
         return False
     
 
+# def load_chroma_from_zip(zip_file):
+#     # Create a temp folder
+#     temp_dir = tempfile.mkdtemp()
+
+#     # Extract ZIP
+#     with zipfile.ZipFile(zip_file, "r") as z:
+#         z.extractall(temp_dir)
+
+#     # Find extracted folder (first subdir)
+#     subdirs = [os.path.join(temp_dir, d) for d in os.listdir(temp_dir)]
+#     persist_dir =  Path(subdirs[0])     # the actual chroma folder
+#     # Load the Chroma DB
+#     st.info(f'persist_dir : {str(persist_dir)}')
+#     db_file = dp.list_dir_content(persist_dir)
+
+#     # if file:
+#     #     st.info(f"Found file : {file}, Loading....")
+#     #     try:
+#     #         with open(os.path.join(str(persist_dir),file), "rb") as f:
+#     #             combined_text = base64.b64encode(f.read()).decode("utf-8")
+#     #             st.success(f"✅ File : {file} Loaded Successfully!")
+#     #     except Exception as e:
+#     #         st.error(f"❌Failed to load file : {file} with exception {e}")
+
+#     # st.session_state.temp_embedding_path = str(persist_dir)
+#     # st.success(f"✅ Embeddings '{persist_dir.name}' uploaded successfully!")
+#     # st.info("📄 Document upload disabled since embeddings are provided directly.")
+    
+#     return db_file
+
 def load_chroma_from_zip(zip_file):
-    # Create a temp folder
+
+    # Create temporary directory
     temp_dir = tempfile.mkdtemp()
 
     # Extract ZIP
     with zipfile.ZipFile(zip_file, "r") as z:
         z.extractall(temp_dir)
 
-    # Find extracted folder (first subdir)
-    subdirs = [os.path.join(temp_dir, d) for d in os.listdir(temp_dir)]
-    persist_dir =  Path(subdirs[0])     # the actual chroma folder
-    # Load the Chroma DB
-    st.info(f'persist_dir : {str(persist_dir)}')
-    db_file = dp.list_dir_content(persist_dir)
+    # Scan all subdirectories
+    dirs = [
+        os.path.join(temp_dir, d)
+        for d in os.listdir(temp_dir)
+        if os.path.isdir(os.path.join(temp_dir, d))
+    ]
 
-    # if file:
-    #     st.info(f"Found file : {file}, Loading....")
-    #     try:
-    #         with open(os.path.join(str(persist_dir),file), "rb") as f:
-    #             combined_text = base64.b64encode(f.read()).decode("utf-8")
-    #             st.success(f"✅ File : {file} Loaded Successfully!")
-    #     except Exception as e:
-    #         st.error(f"❌Failed to load file : {file} with exception {e}")
+    persist_dir = None
 
-    # st.session_state.temp_embedding_path = str(persist_dir)
-    # st.success(f"✅ Embeddings '{persist_dir.name}' uploaded successfully!")
-    # st.info("📄 Document upload disabled since embeddings are provided directly.")
-    
-    return db_file
+    # Look for ANY file ending with .sqlite3
+    for d in dirs:
+        contents = os.listdir(d)
+        sqlite_files = [f for f in contents if f.endswith(".sqlite3")]
+
+        if sqlite_files:
+            # Check Chroma required structure
+            has_index = os.path.isdir(os.path.join(d, "index"))
+            has_collections = os.path.isdir(os.path.join(d, "collections"))
+
+            if has_index and has_collections:
+                persist_dir = d
+                break
+
+    if persist_dir is None:
+        raise FileNotFoundError(
+            "No valid Chroma persist directory found (.sqlite3 + index + collections)."
+        )
+
+    st.info(f"Using persist_dir: {persist_dir}")
+
+    # Load embeddings
+    embeddings = OpenAIEmbeddings(api_key=streamlit_secrets.get_openai_key())
+
+    # Load Chroma DB
+    db = Chroma(
+        persist_directory=persist_dir,
+        embedding_function=embeddings
+    )
+
+    combined_text = None
+    return combined_text, db

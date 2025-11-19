@@ -112,7 +112,8 @@ def run():
         st.write("### Upload Your Embeddings")
         uploaded_embeddings = st.file_uploader("Upload your Chroma DB (.zip)", type=["zip"])
         if uploaded_embeddings:
-            st.session_state.chroma_database = lap.load_chroma_from_zip(uploaded_embeddings)
+            st.session_state.combined_text, st.session_state.chroma_database \
+                = lap.load_chroma_from_zip(uploaded_embeddings)
 
             if st.button("🚀 Start Analysis"):
                 st.session_state.start_analysis = True
