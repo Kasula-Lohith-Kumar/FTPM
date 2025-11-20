@@ -1,8 +1,9 @@
+import os
+import json
 import streamlit as st
 import gspread
 from  google_sheets import gsheets_config as gsc
 from  google_sheets import gsheets_operations as gso
-import json
 
 
 def login_verification(input_username: str, input_password: str) -> bool:
@@ -180,3 +181,11 @@ def is_streamlit_cloud() -> bool:
         return True
     except Exception:
         return False
+
+# def is_streamlit_cloud() -> bool:
+#     """Detect Streamlit Cloud reliably."""
+#     return os.environ.get("STREAMLIT_RUNTIME") == "cloud"
+
+# def is_streamlit_cloud():
+#     return "STREAMLIT_SERVER_HOST" in os.environ and \
+#            os.environ["STREAMLIT_SERVER_HOST"].endswith(".streamlit.app")

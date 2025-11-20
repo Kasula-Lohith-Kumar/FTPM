@@ -1,6 +1,9 @@
-import streamlit as st
-import tempfile
 import os
+import uuid
+import streamlit as st
+import config
+import document_processor as dp
+import langchain_api_prompts as lap
 
 def run():
     # --- HIDE DEFAULT SIDEBAR ---
@@ -50,6 +53,14 @@ def run():
         ("📄 Upload Document", "🧠 Upload Embeddings"),
         horizontal=True,
     )
+    if st.session_state.upload_mode != upload_mode:
+        st.session_state.start_analysis = False
+        st.session_state.embeddings_generated = False
+        st.session_state.chat_history = []
+        st.session_state.combined_text = ''
+        st.session_state.db_file_path = None
+        st.session_state.chroma_database = None
+
     st.session_state.upload_mode = upload_mode
 
     # --- FILE UPLOAD SECTION ---
@@ -58,7 +69,13 @@ def run():
         uploaded_doc = st.file_uploader("Upload a PDF, DOCX, or TXT file", type=["pdf", "docx", "txt"])
 
         if uploaded_doc:
-            temp_doc_path = os.path.join(tempfile.gettempdir(), uploaded_doc.name)
+            st.session_state['upload_temp_path'] = None
+            temp_path = os.path.join(config.WORKING_DIR, str(uuid.uuid4()))
+            if not os.path.exists(temp_path):
+                os.makedirs(temp_path)
+            st.session_state.upload_temp_path = temp_path
+            temp_doc_path = os.path.join(temp_path, uploaded_doc.name)
+            print(f'temp_doc_path: {temp_doc_path}')
             with open(temp_doc_path, "wb") as f:
                 f.write(uploaded_doc.getbuffer())
             st.success(f"✅ Document '{uploaded_doc.name}' uploaded successfully!")
@@ -66,27 +83,24 @@ def run():
             # Generate embeddings button
             if st.button("⚙️ Generate Embeddings"):
                 # --- PLACE YOUR EMBEDDING LOGIC HERE ---
-                # Example:
-                # embedding_path = generate_embeddings(temp_doc_path)
-
-                fake_embed_path = os.path.join(tempfile.gettempdir(), "generated_embeddings.faiss")
-                with open(fake_embed_path, "w") as f:
-                    f.write("Temporary embedding data placeholder")
-
+                st.session_state.combined_text = \
+                    dp.extract_images_and_text_from_pdf(temp_doc_path)
+                splits = lap.process_text_data(st.session_state.combined_text)
+                st.session_state.chroma_database = lap.chroma_db(splits)
                 st.session_state.embeddings_generated = True
-                st.session_state.temp_embedding_path = fake_embed_path
-                st.success("✅ Embeddings generated successfully!")
+                
 
         # --- If embeddings are generated ---
         if st.session_state.embeddings_generated:
             st.info(f"✅ Using generated embeddings: `{st.session_state.temp_embedding_path}`")
-
+            zip_file = lap.zip_chroma_db(working_dir=st.session_state.upload_temp_path,
+                              output_zip_path='chroma_db_export.zip')
             # Download embeddings button
-            with open(st.session_state.temp_embedding_path, "rb") as file:
+            with open(zip_file, "rb") as file:
                 st.download_button(
                     label="💾 Download Embeddings",
                     data=file,
-                    file_name=os.path.basename(st.session_state.temp_embedding_path),
+                    file_name=zip_file,
                     mime="application/octet-stream"
                 )
 
@@ -97,17 +111,9 @@ def run():
     else:
         # --- Upload embeddings directly ---
         st.write("### Upload Your Embeddings")
-        uploaded_embeddings = st.file_uploader("Upload your FAISS / vector DB file", type=["faiss", "pkl", "bin"])
-
+        uploaded_embeddings = st.file_uploader("Upload your Chroma DB (.zip)", type=["zip"])
         if uploaded_embeddings:
-            temp_embed_path = os.path.join(tempfile.gettempdir(), uploaded_embeddings.name)
-            with open(temp_embed_path, "wb") as f:
-                f.write(uploaded_embeddings.getbuffer())
-
-            st.session_state.temp_embedding_path = temp_embed_path
-            st.success(f"✅ Embeddings '{uploaded_embeddings.name}' uploaded successfully!")
-            st.info("📄 Document upload disabled since embeddings are provided directly.")
-
+            st.session_state.chroma_database = lap.load_chroma_from_zip(uploaded_embeddings)
             if st.button("🚀 Start Analysis"):
                 st.session_state.start_analysis = True
 
@@ -122,8 +128,10 @@ def run():
 
         if user_input:
             # Placeholder chatbot response (replace with your model logic)
-            response = f"🤖 (Mock Response) The analysis for '{user_input}' will appear here."
-            st.session_state.chat_history.append((user_input, response))
+            result = lap.text_retraivalQA(st.session_state.chroma_database, user_input)
+            dp.display_content(result)
+            # response = f"🤖 (Mock Response) The analysis for '{user_input}' will appear here."
+            st.session_state.chat_history.append((user_input, result['answer']))
 
         # Display chat
         for q, a in st.session_state.chat_history:
