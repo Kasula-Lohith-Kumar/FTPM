@@ -302,7 +302,7 @@ def chroma_db(splits):
 
 def text_retraivalQA(database, query):
 
-    llm = ChatOpenAI(model="gpt-4o", temperature=0)
+    llm = ChatOpenAI(model="gpt-4o", temperature=0,api_key=streamlit_secrets.get_openai_key())
     retriever = database.as_retriever()
 
     # Step 3: Prompt template
