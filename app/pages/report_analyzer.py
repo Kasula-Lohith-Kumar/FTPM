@@ -1,4 +1,5 @@
 import os
+import tempfile
 import streamlit as st
 import config
 import document_processor as dp
@@ -68,9 +69,10 @@ def run():
         uploaded_doc = st.file_uploader("Upload a PDF, DOCX, or TXT file", type=["pdf", "docx", "txt"])
 
         if uploaded_doc:
-            if not os.path.exists(config.WORKING_DIR):
-                os.makedirs(config.WORKING_DIR)
-            temp_doc_path = os.path.join(config.WORKING_DIR, uploaded_doc.name)
+            temp_path = os.path.join(config.WORKING_DIR, tempfile.gettempdir())
+            if not os.path.exists(temp_path):
+                os.makedirs(temp_path)
+            temp_doc_path = os.path.join(temp_path, uploaded_doc.name)
             print(f'temp_doc_path: {temp_doc_path}')
             with open(temp_doc_path, "wb") as f:
                 f.write(uploaded_doc.getbuffer())
