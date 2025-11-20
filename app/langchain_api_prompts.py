@@ -36,12 +36,6 @@ llm = ChatOpenAI(
     temperature=0.7  # adjust as needed
     )
 
-llm_embd = OpenAIEmbeddings(
-    model="text-embedding-3-large",    # recommended
-    api_key=streamlit_secrets.get_openai_key()
-)
-
-
 client = OpenAI(api_key=streamlit_secrets.get_openai_key())
 
 
@@ -265,47 +259,34 @@ def faiss_db(splits):
 
 
 def chroma_db(splits):
-    """
-    Creates and returns a Chroma vector store from documents using OpenAI embeddings.
-    
-    Args:
-        splits: A list of Document objects (from langchain or similar) to embed and store.
-        
-    Returns:
-        A Chroma vector store object.
-    """
-    # Assuming 'secrets.get_openai_key()' is available and returns the key
-    # In a typical setup, the key might be read from an environment variable automatically
-    # by OpenAIEmbeddings, but we pass it explicitly here for consistency.
-    # Note: Using 'from langchain_openai import OpenAIEmbeddings' is the modern approach.
 
-    # Chroma.from_documents is the direct equivalent of FAISS.from_documents
-    db =None
-    
     embd_path = os.path.join(tempfile.gettempdir(), config.PERSISTANT_PATH)
 
-    if embd_path and os.path.exists(embd_path):
+    # Cleanup old DB
+    if os.path.exists(embd_path):
         shutil.rmtree(embd_path)
         st.success("🗑️ Chroma DB folder deleted!")
         st.session_state.embeddings_generated = False
 
+    # Use correct embedding model
+    embedding_model = OpenAIEmbeddings(
+        model="text-embedding-3-small",
+        api_key=streamlit_secrets.get_openai_key()
+    )
+
     db = Chroma.from_documents(
-        documents = splits, 
-        embedding = llm_embd,
-        persist_directory = embd_path
+        documents=splits,
+        embedding=embedding_model,
+        persist_directory=embd_path
     )
 
     try:
         db.persist()
         st.success("✅ Embeddings generated successfully!")
-        st.info("✅ Chroma DB persisted successfully.")
-        st.session_state.embeddings_generated = True
-    
     except Exception as e:
-        st.info(f"❌ Error while persisting Chroma DB: {e}")
+        st.error(f"❌ Error while persisting Chroma DB: {e}")
 
     st.session_state.temp_embedding_path = embd_path
-    
     return db
 
 def text_retraivalQA(database, query):
