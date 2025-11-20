@@ -11,8 +11,9 @@ import langchain_api_prompts as lap
 
 
 def get_image_folder_path():
-    cwd = os.getcwd()
-    return os.path.join(cwd, config.IMAGE_FOLDER_PATH)
+    if not os.path.exists(config.WORKING_DIR):
+        os.makedirs(config.WORKING_DIR)
+    return os.path.join(config.WORKING_DIR, config.IMAGE_FOLDER_PATH)
 
 
 # Open the image file and encode it as a base64 string
@@ -25,10 +26,6 @@ def extract_images_and_text_from_pdf(pdf_path):
     # Open the PDF file
     pdf_document = fitz.open(pdf_path)
     image_folder_path = get_image_folder_path()
-
-    # Create the output folder if it doesn't exist
-    if not os.path.exists(image_folder_path):
-        os.makedirs(image_folder_path)
 
     # Initialize a variable to store the combined text
     combined_text = ""

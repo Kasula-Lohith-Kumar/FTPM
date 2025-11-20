@@ -274,9 +274,8 @@ def chroma_db(splits):
     # -----------------------
     # 1. Create a fresh folder
     # -----------------------
-    base_dir = tempfile.gettempdir()
     unique_folder = f"chroma_{next(tempfile._get_candidate_names())}"
-    embd_path = os.path.join(base_dir, unique_folder)
+    embd_path = os.path.join(config.WORKING_DIR, unique_folder)
 
     # -----------------------
     # 2. Create embed model
@@ -357,8 +356,8 @@ def save_embd(db, dst_file):
 
 def load_chroma_from_zip(zip_file):
 
-    temp_dir = tempfile.TemporaryDirectory()
-    extract_path = temp_dir.name
+    extract_path = config.EMBBED_EXRT_PATH
+    # extract_path = temp_dir.name
 
     # Extract the zip
     with zipfile.ZipFile(zip_file, "r") as z:
@@ -406,15 +405,18 @@ def load_chroma_from_zip(zip_file):
         st.exception(e)
         return None
 
-def zip_chroma_db(persist_dir, output_zip_path):
-    persist_dir = Path(persist_dir)
+def zip_chroma_db(working_dir, output_zip_path):
+    persist_dir = Path(st.session_state.temp_embedding_path)
+    zip_folder_path = Path(working_dir)
 
     if not persist_dir.exists():
         raise FileNotFoundError(f"Persist directory not found: {persist_dir}")
 
     # --- List contents ---
     files = [f for f in os.listdir(persist_dir) if f.endswith(".sqlite3")]
+    print(f'files : {files}')
     dirs = [d for d in os.listdir(persist_dir) if (persist_dir / d).is_dir()]
+    print(f'dirs : {dirs}')
 
     # --- Validate ---
     if not files:
@@ -427,10 +429,10 @@ def zip_chroma_db(persist_dir, output_zip_path):
 
     # --- Create ZIP ---
     with zipfile.ZipFile(output_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-        for root, _dirs, file_list in os.walk(persist_dir):
+        for root, _dirs, file_list in os.walk(zip_folder_path):
             for file in file_list:
                 file_path = os.path.join(root, file)
-                arcname = os.path.relpath(file_path, persist_dir)
+                arcname = os.path.relpath(file_path, zip_folder_path)
                 zipf.write(file_path, arcname)
 
     return output_zip_path

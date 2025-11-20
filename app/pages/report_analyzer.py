@@ -1,10 +1,8 @@
 import os
-import tempfile
 import streamlit as st
 import config
 import document_processor as dp
 import langchain_api_prompts as lap
-import shutil
 
 def run():
     # --- HIDE DEFAULT SIDEBAR ---
@@ -70,7 +68,10 @@ def run():
         uploaded_doc = st.file_uploader("Upload a PDF, DOCX, or TXT file", type=["pdf", "docx", "txt"])
 
         if uploaded_doc:
-            temp_doc_path = os.path.join(tempfile.gettempdir(), uploaded_doc.name)
+            if not os.path.exists(config.WORKING_DIR):
+                os.makedirs(config.WORKING_DIR)
+            temp_doc_path = os.path.join(config.WORKING_DIR, uploaded_doc.name)
+            print(f'temp_doc_path: {temp_doc_path}')
             with open(temp_doc_path, "wb") as f:
                 f.write(uploaded_doc.getbuffer())
             st.success(f"✅ Document '{uploaded_doc.name}' uploaded successfully!")
@@ -90,7 +91,7 @@ def run():
             st.info(f"✅ Using generated embeddings: `{st.session_state.temp_embedding_path}`")
             # st.session_state.db_file_path = os.path.join(st.session_state.temp_embedding_path, 
             #                                              'chroma_db_export.zip')
-            zip_file = lap.zip_chroma_db(persist_dir=st.session_state.temp_embedding_path,
+            zip_file = lap.zip_chroma_db(working_dir=config.WORKING_DIR,
                               output_zip_path='chroma_db_export.zip')
             # Download embeddings button
             with open(zip_file, "rb") as file:
@@ -126,7 +127,6 @@ def run():
         if user_input:
             # Placeholder chatbot response (replace with your model logic)
             result = lap.text_retraivalQA(st.session_state.chroma_database, user_input)
-            st.info(result)
             dp.display_content(result)
             # response = f"🤖 (Mock Response) The analysis for '{user_input}' will appear here."
             st.session_state.chat_history.append((user_input, result['answer']))
