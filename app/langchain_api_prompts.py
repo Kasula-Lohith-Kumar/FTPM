@@ -315,34 +315,39 @@ def chroma_db(splits):
 
 
 def text_retraivalQA(database, query):
-    chain = None
-    llm = ChatOpenAI(model="gpt-4o", temperature=0,api_key=streamlit_secrets.get_openai_key())
+
     retriever = database.as_retriever()
 
-    # Step 3: Prompt template
+    llm = ChatOpenAI(model="gpt-4o", temperature=0,
+                     api_key=streamlit_secrets.get_openai_key())
+
     template = """Use the following pieces of context to answer the question at the end.
-                If you don't know the answer and don't find it in the given context,
-                just say that you don't know. Don't try to make up an answer.
+    If you don't know the answer, say you don't know.
 
-                {context}
+    {context}
 
-                Question: {question}
+    Question: {question}
 
-                Helpful Answer:
-                """
+    Helpful Answer:"""
+
     QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
 
-    # Step 4: Build RetrievalQA manually using Runnable syntax
+    # FIX: Include return of source documents
     chain = (
         {"context": retriever, "question": RunnablePassthrough()}
         | QA_CHAIN_PROMPT
         | llm
     )
 
-    # Step 5: Invoke chain
-    result = chain.invoke(query)
+    # Call the retriever separately
+    docs = retriever.get_relevant_documents(query)
 
-    return result
+    answer = chain.invoke(query)
+
+    return {
+        "answer": answer.content,
+        "source_documents": docs
+    }
 
 def save_embd(db, dst_file):
     os.makedirs(dst_file, exist_ok=True)
