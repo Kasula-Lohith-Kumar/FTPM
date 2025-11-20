@@ -11,9 +11,7 @@ import langchain_api_prompts as lap
 
 
 def get_image_folder_path():
-    if not os.path.exists(config.WORKING_DIR):
-        os.makedirs(config.WORKING_DIR)
-    return os.path.join(config.WORKING_DIR, config.IMAGE_FOLDER_PATH)
+    return os.path.join(st.session_state.upload_temp_path, config.IMAGE_FOLDER_PATH)
 
 
 # Open the image file and encode it as a base64 string
