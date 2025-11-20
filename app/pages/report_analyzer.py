@@ -1,5 +1,5 @@
 import os
-import tempfile
+import uuid
 import streamlit as st
 import config
 import document_processor as dp
@@ -69,8 +69,9 @@ def run():
         uploaded_doc = st.file_uploader("Upload a PDF, DOCX, or TXT file", type=["pdf", "docx", "txt"])
 
         if uploaded_doc:
+            st.session_state.embeddings_generated = False
             st.session_state['upload_temp_path'] = None
-            temp_path = os.path.join(config.WORKING_DIR, tempfile.gettempdir())
+            temp_path = os.path.join(config.WORKING_DIR, str(uuid.uuid4()))
             if not os.path.exists(temp_path):
                 os.makedirs(temp_path)
             st.session_state.upload_temp_path = temp_path
@@ -93,9 +94,7 @@ def run():
         # --- If embeddings are generated ---
         if st.session_state.embeddings_generated:
             st.info(f"✅ Using generated embeddings: `{st.session_state.temp_embedding_path}`")
-            # st.session_state.db_file_path = os.path.join(st.session_state.temp_embedding_path, 
-            #                                              'chroma_db_export.zip')
-            zip_file = lap.zip_chroma_db(working_dir=config.WORKING_DIR,
+            zip_file = lap.zip_chroma_db(working_dir=st.session_state.upload_temp_path,
                               output_zip_path='chroma_db_export.zip')
             # Download embeddings button
             with open(zip_file, "rb") as file:

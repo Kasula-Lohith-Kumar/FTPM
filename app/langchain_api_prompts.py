@@ -275,7 +275,7 @@ def chroma_db(splits):
     # 1. Create a fresh folder
     # -----------------------
     unique_folder = f"chroma_{next(tempfile._get_candidate_names())}"
-    embd_path = os.path.join(config.WORKING_DIR, unique_folder)
+    embd_path = os.path.join(st.session_state.upload_temp_path, unique_folder)
 
     # -----------------------
     # 2. Create embed model
