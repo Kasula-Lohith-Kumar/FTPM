@@ -280,14 +280,14 @@ def chroma_db(splits):
     # Note: Using 'from langchain_openai import OpenAIEmbeddings' is the modern approach.
 
     # Chroma.from_documents is the direct equivalent of FAISS.from_documents
-
+    db =None
+    
     embd_path = os.path.join(tempfile.gettempdir(), config.PERSISTANT_PATH)
 
     if embd_path and os.path.exists(embd_path):
         shutil.rmtree(embd_path)
         st.success("🗑️ Chroma DB folder deleted!")
         st.session_state.embeddings_generated = False
-        del db
 
     db = Chroma.from_documents(
         documents = splits, 
