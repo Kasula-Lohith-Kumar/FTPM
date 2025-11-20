@@ -271,43 +271,46 @@ def faiss_db(splits):
 
 def chroma_db(splits):
 
-    embd_path = os.path.join(tempfile.gettempdir(), config.PERSISTANT_PATH)
+    # -----------------------
+    # 1. Create a fresh folder
+    # -----------------------
+    base_dir = tempfile.gettempdir()
+    unique_folder = f"chroma_{next(tempfile._get_candidate_names())}"
+    embd_path = os.path.join(base_dir, unique_folder)
 
-    # --- 1. Safely close previous DB ---
-    try:
-        if "chroma_database" in st.session_state and st.session_state.chroma_database:
-            st.session_state.chroma_database._client.reset()  # IMPORTANT!
-            st.session_state.chroma_database = None
-    except Exception as e:
-        print(f"Warning: could not reset Chroma client: {e}")
-
-    # --- 2. Delete folder after closing client ---
-    if os.path.exists(embd_path):
-        shutil.rmtree(embd_path)
-        st.success("🗑️ Chroma DB folder deleted!")
-        st.session_state.embeddings_generated = False
-
-    # --- 3. Re-create new embedding model ---
+    # -----------------------
+    # 2. Create embed model
+    # -----------------------
     embedding_model = OpenAIEmbeddings(
         model="text-embedding-3-small",
         api_key=streamlit_secrets.get_openai_key()
     )
 
-    # --- 4. Rebuild DB ---
+    # -----------------------
+    # 3. Build new DB
+    # -----------------------
     db = Chroma.from_documents(
         documents=splits,
         embedding=embedding_model,
         persist_directory=embd_path
     )
 
+    # -----------------------
+    # 4. Persist safely
+    # -----------------------
     try:
         db.persist()
-        st.success("✅ Embeddings generated successfully!")
+        st.success(f"✅ Chroma DB created at {embd_path}")
     except Exception as e:
         st.error(f"❌ Error while persisting Chroma DB: {e}")
 
+    # -----------------------
+    # 5. Save references
+    # -----------------------
     st.session_state.temp_embedding_path = embd_path
     st.session_state.chroma_database = db
+    st.session_state.embeddings_generated = True
+
     return db
 
 
