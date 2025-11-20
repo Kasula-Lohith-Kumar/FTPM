@@ -340,7 +340,7 @@ def text_retraivalQA(database, query):
     )
 
     # Call the retriever separately
-    docs = retriever.get_relevant_documents(query)
+    docs = retriever.invoke(query)
 
     answer = chain.invoke(query)
 
