@@ -274,6 +274,7 @@ def chroma_db(splits):
     embd_path = os.path.join(tempfile.gettempdir(), config.PERSISTANT_PATH)
 
     # Cleanup old DB
+    db = None
     if os.path.exists(embd_path):
         shutil.rmtree(embd_path)
         st.success("🗑️ Chroma DB folder deleted!")
