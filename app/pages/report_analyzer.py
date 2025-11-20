@@ -126,6 +126,7 @@ def run():
         if user_input:
             # Placeholder chatbot response (replace with your model logic)
             response = lap.text_retraivalQA(st.session_state.chroma_database, user_input).content
+            dp.display_content(response)
             # response = f"🤖 (Mock Response) The analysis for '{user_input}' will appear here."
             st.session_state.chat_history.append((user_input, response))
 
