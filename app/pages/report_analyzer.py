@@ -82,6 +82,7 @@ def run():
                     dp.extract_images_and_text_from_pdf(temp_doc_path)
                 splits = lap.process_text_data(st.session_state.combined_text)
                 st.session_state.chroma_database = lap.chroma_db(splits)
+                st.session_state.embeddings_generated = True
                 
 
         # --- If embeddings are generated ---
