@@ -69,9 +69,11 @@ def run():
         uploaded_doc = st.file_uploader("Upload a PDF, DOCX, or TXT file", type=["pdf", "docx", "txt"])
 
         if uploaded_doc:
+            st.session_state['upload_temp_path'] = None
             temp_path = os.path.join(config.WORKING_DIR, tempfile.gettempdir())
             if not os.path.exists(temp_path):
                 os.makedirs(temp_path)
+            st.session_state.upload_temp_path = temp_path
             temp_doc_path = os.path.join(temp_path, uploaded_doc.name)
             print(f'temp_doc_path: {temp_doc_path}')
             with open(temp_doc_path, "wb") as f:
