@@ -69,7 +69,6 @@ def run():
         uploaded_doc = st.file_uploader("Upload a PDF, DOCX, or TXT file", type=["pdf", "docx", "txt"])
 
         if uploaded_doc:
-            st.session_state.embeddings_generated = False
             st.session_state['upload_temp_path'] = None
             temp_path = os.path.join(config.WORKING_DIR, str(uuid.uuid4()))
             if not os.path.exists(temp_path):

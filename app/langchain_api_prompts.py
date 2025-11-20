@@ -245,11 +245,14 @@ def describe_image(base64_image: str):
 
 
 def process_text_data(combined_text):
+    
+    text_file = os.path.join(st.session_state.upload_temp_path, 
+                 config.COMBINED_TEXT_FILE)
 
-    with open(r'temp.txt', "w", encoding="utf-8") as f:
+    with open(text_file, "w", encoding="utf-8") as f:
         f.write(combined_text)
 
-    loader = TextLoader(r'temp.txt', encoding="utf-8")
+    loader = TextLoader(text_file, encoding="utf-8")
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
