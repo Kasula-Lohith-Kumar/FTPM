@@ -310,14 +310,6 @@ def chroma_db(splits):
 
 def text_retraivalQA(database, query):
 
-    # Step 1: Split text (your existing helper)
-    # text_splits = process_text_data(combined_text)
-
-    # Step 2: Build vector DB
-    # database = chroma_db(text_splits)
-    # if save_chroma_embd(database):
-    #     st.session_state.embeddings_generated = True
-    #     st.success("✅ Embeddings generated successfully!")
     retriever = database.as_retriever()
 
     # Step 3: Prompt template
@@ -350,38 +342,6 @@ def save_embd(db, dst_file):
     temp_path = os.path.join(dst_file, 'data.faiss')
     faiss.write_index(db.index, temp_path) 
 
-
-    
-
-# def load_chroma_from_zip(zip_file):
-#     # Create a temp folder
-#     temp_dir = tempfile.mkdtemp()
-
-#     # Extract ZIP
-#     with zipfile.ZipFile(zip_file, "r") as z:
-#         z.extractall(temp_dir)
-
-#     # Find extracted folder (first subdir)
-#     subdirs = [os.path.join(temp_dir, d) for d in os.listdir(temp_dir)]
-#     persist_dir =  Path(subdirs[0])     # the actual chroma folder
-#     # Load the Chroma DB
-#     st.info(f'persist_dir : {str(persist_dir)}')
-#     db_file = dp.list_dir_content(persist_dir)
-
-#     # if file:
-#     #     st.info(f"Found file : {file}, Loading....")
-#     #     try:
-#     #         with open(os.path.join(str(persist_dir),file), "rb") as f:
-#     #             combined_text = base64.b64encode(f.read()).decode("utf-8")
-#     #             st.success(f"✅ File : {file} Loaded Successfully!")
-#     #     except Exception as e:
-#     #         st.error(f"❌Failed to load file : {file} with exception {e}")
-
-#     # st.session_state.temp_embedding_path = str(persist_dir)
-#     # st.success(f"✅ Embeddings '{persist_dir.name}' uploaded successfully!")
-#     # st.info("📄 Document upload disabled since embeddings are provided directly.")
-    
-#     return db_file
 
 def load_chroma_from_zip(zip_file):
 
