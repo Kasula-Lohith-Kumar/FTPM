@@ -273,19 +273,27 @@ def chroma_db(splits):
 
     embd_path = os.path.join(tempfile.gettempdir(), config.PERSISTANT_PATH)
 
-    # Cleanup old DB
-    db = None
+    # --- 1. Safely close previous DB ---
+    try:
+        if "chroma_database" in st.session_state and st.session_state.chroma_database:
+            st.session_state.chroma_database._client.reset()  # IMPORTANT!
+            st.session_state.chroma_database = None
+    except Exception as e:
+        print(f"Warning: could not reset Chroma client: {e}")
+
+    # --- 2. Delete folder after closing client ---
     if os.path.exists(embd_path):
         shutil.rmtree(embd_path)
         st.success("🗑️ Chroma DB folder deleted!")
         st.session_state.embeddings_generated = False
 
-    # Use correct embedding model
+    # --- 3. Re-create new embedding model ---
     embedding_model = OpenAIEmbeddings(
         model="text-embedding-3-small",
         api_key=streamlit_secrets.get_openai_key()
     )
 
+    # --- 4. Rebuild DB ---
     db = Chroma.from_documents(
         documents=splits,
         embedding=embedding_model,
@@ -299,7 +307,9 @@ def chroma_db(splits):
         st.error(f"❌ Error while persisting Chroma DB: {e}")
 
     st.session_state.temp_embedding_path = embd_path
+    st.session_state.chroma_database = db
     return db
+
 
 def text_retraivalQA(database, query):
 
