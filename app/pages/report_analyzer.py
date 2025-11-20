@@ -78,15 +78,6 @@ def run():
             # Generate embeddings button
             if st.button("⚙️ Generate Embeddings"):
                 # --- PLACE YOUR EMBEDDING LOGIC HERE ---
-                # Example:
-                # embedding_path = generate_embeddings(temp_doc_path)
-                # Delete the collection before creating a new one
-                embd_path = os.path.join(tempfile.gettempdir(), config.PERSISTANT_PATH)
-                if embd_path and os.path.exists(embd_path):
-                    shutil.rmtree(embd_path)
-                    st.success("🗑️ Chroma DB folder deleted!")
-                    st.session_state.embeddings_generated = False
-
                 st.session_state.combined_text = \
                     dp.extract_images_and_text_from_pdf(temp_doc_path)
                 splits = lap.process_text_data(st.session_state.combined_text)

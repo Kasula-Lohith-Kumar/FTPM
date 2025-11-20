@@ -283,11 +283,11 @@ def chroma_db(splits):
 
     embd_path = os.path.join(tempfile.gettempdir(), config.PERSISTANT_PATH)
 
-    # if not os.path.exists(embd_path):
-    #     os.makedirs(embd_path)
-
-    if os.path.exists(embd_path):
+    if embd_path and os.path.exists(embd_path):
         shutil.rmtree(embd_path)
+        st.success("🗑️ Chroma DB folder deleted!")
+        st.session_state.embeddings_generated = False
+        del db
 
     db = Chroma.from_documents(
         documents = splits, 
