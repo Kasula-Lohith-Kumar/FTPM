@@ -62,16 +62,10 @@ def run():
         st.session_state.db_file_path = None
         st.session_state.chroma_database = None
 
-        # embd_path = os.path.join(tempfile.gettempdir(), config.PERSISTANT_PATH)
-        # if os.path.exists(embd_path):
-        #     shutil.rmtree(embd_path)
-
     st.session_state.upload_mode = upload_mode
 
     # --- FILE UPLOAD SECTION ---
     if upload_mode == "📄 Upload Document":
-        # if not st.session_state.start_analysis or not st.session_state.embeddings_generated:
-        #     st.rerun()
         st.write("### Upload Your Document")
         uploaded_doc = st.file_uploader("Upload a PDF, DOCX, or TXT file", type=["pdf", "docx", "txt"])
 
@@ -100,9 +94,6 @@ def run():
                 splits = lap.process_text_data(st.session_state.combined_text)
                 st.session_state.chroma_database = lap.chroma_db(splits)
                 
-                # if lap.save_chroma_embd(st.session_state.chroma_database):
-                #     st.session_state.embeddings_generated = True
-                #     st.success("✅ Embeddings generated successfully!")
 
         # --- If embeddings are generated ---
         if st.session_state.embeddings_generated:
