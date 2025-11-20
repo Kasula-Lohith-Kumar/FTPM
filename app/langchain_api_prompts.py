@@ -274,8 +274,6 @@ def chroma_db(splits):
     # -----------------------
     # 1. Create a fresh folder
     # -----------------------
-
-    st.info(splits)
     base_dir = tempfile.gettempdir()
     unique_folder = f"chroma_{next(tempfile._get_candidate_names())}"
     embd_path = os.path.join(base_dir, unique_folder)
