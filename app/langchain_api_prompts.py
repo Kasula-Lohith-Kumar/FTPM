@@ -29,19 +29,14 @@ import document_processor as dp
 if "buffer" not in st.session_state:
     st.session_state.buffer = []
 
-# --- Initialize model ---
-llm = ChatOpenAI(
-    model="gpt-4.1-mini",
-    api_key=streamlit_secrets.get_openai_key(),
-    temperature=0.7  # adjust as needed
-    )
-
-client = OpenAI(api_key=streamlit_secrets.get_openai_key())
-
-
 
 def learning_material():
     # Prepare the prompt dynamically
+    llm = ChatOpenAI(
+        model="gpt-4.1-mini",
+        api_key=streamlit_secrets.get_openai_key(),
+        temperature=0.7  # adjust as needed
+        )
     prompt = f"""
     You are a financial guide/teacher who provides detailed information 
     on the subtopic '{st.session_state.selected_topic[2]}' 
@@ -62,6 +57,8 @@ def voice(text):
     Generate text-to-speech audio for the given text and return raw audio bytes.
     """
     try:
+        client = OpenAI(api_key=streamlit_secrets.get_openai_key())
+
         response = client.audio.speech.create(
             model="gpt-4o-mini-tts",
             voice="alloy",
@@ -97,7 +94,11 @@ def generate_quiz():
     """
 
     try:
-        
+        llm = ChatOpenAI(
+            model="gpt-4.1-mini",
+            api_key=streamlit_secrets.get_openai_key(),
+            temperature=0.7  # adjust as needed
+            )
         # Send the prompt
         response = llm.invoke([HumanMessage(content=prompt)])
 
@@ -144,6 +145,12 @@ def chat_bot():
     "Please stay on our current learning topic."
     Always respond in {st.session_state.language}, unless the user explicitly asks for another language.
     """
+
+    llm = ChatOpenAI(
+    model="gpt-4.1-mini",
+    api_key=streamlit_secrets.get_openai_key(),
+    temperature=0.7  # adjust as needed
+    )
 
     # 🔹 Convert session_state.buffer → LangChain message objects
     messages = [SystemMessage(content=system_prompt)]
@@ -199,6 +206,10 @@ def describe_image(base64_image: str):
     Uses OpenAI GPT-4o with LangChain to extract text from an image
     and return the extracted text plus a summary.
     """
+    vision_model = ChatOpenAI(
+        model="gpt-4o",
+        api_key=streamlit_secrets.get_openai_key()
+    )
 
     # Prepare messages
     messages = [
@@ -229,7 +240,7 @@ def describe_image(base64_image: str):
         )
     ]
 
-    response = llm_embd.invoke(messages)
+    response = vision_model.invoke(messages)
     return response.content
 
 
@@ -291,6 +302,7 @@ def chroma_db(splits):
 
 def text_retraivalQA(database, query):
 
+    llm = ChatOpenAI(model="gpt-4o", temperature=0)
     retriever = database.as_retriever()
 
     # Step 3: Prompt template
@@ -356,11 +368,16 @@ def load_chroma_from_zip(zip_file):
     persist_dir = sqlite_paths[0]
     st.success(f"Found chroma.sqlite3 at:\n{persist_dir}")
 
+    embedding_model = OpenAIEmbeddings(
+        model="text-embedding-3-small",
+        api_key=streamlit_secrets.get_openai_key()
+    )
+
     # ---- Load Chroma ----
     try:
         db = Chroma(
             persist_directory=persist_dir,
-            embedding_function=llm_embd
+            embedding_function=embedding_model
         )
         st.success("Chroma DB loaded successfully!")
         return db
