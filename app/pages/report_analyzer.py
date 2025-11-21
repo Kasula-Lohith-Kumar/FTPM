@@ -1,9 +1,12 @@
 import os
 import uuid
-import streamlit as st
 import config
-import document_processor as dp
+import streamlit as st
+from utils import chatbot
+from utils import buffer_u
+from pages import fl_config
 import langchain_api_prompts as lap
+from utils import document_processor as dp
 
 def run():
     # --- HIDE DEFAULT SIDEBAR ---
@@ -18,15 +21,15 @@ def run():
     st.markdown("""
         <style>
             .block-container {
-                padding-left: 6rem;
-                padding-right: 2rem;
+                padding-left: 10rem;
+                padding-right: 10rem;
                 padding-top: 1rem;
             }
         </style>
     """, unsafe_allow_html=True)
 
     # --- PAGE SETUP ---
-    st.set_page_config(page_title="Report Analyzer", page_icon="📊", layout="centered")
+    st.set_page_config(page_title="Report Analyzer", page_icon="📊", layout="wide")
 
     # --- USERNAME HANDLING ---
     username = st.session_state.get("username", "Unknown User")
@@ -46,13 +49,21 @@ def run():
     st.session_state.setdefault("embeddings_generated", False)
     st.session_state.setdefault("temp_embedding_path", None)
     st.session_state.setdefault("start_analysis", False)
+    st.session_state.setdefault("messages", [])
+    st.session_state.setdefault("language", "English")
 
-    # --- MODE SELECTION ---
-    upload_mode = st.radio(
-        "Choose Upload Mode:",
+    # Center title
+    st.markdown("<h4 style='text-align:center;'>Choose Upload Mode</h4>", unsafe_allow_html=True)
+
+    # Create empty columns and place radio in the middle one
+    col1, col2, col3 = st.columns([1,0.8,1])
+    with col2:
+        upload_mode = st.radio(
+        "",
         ("📄 Upload Document", "🧠 Upload Embeddings"),
-        horizontal=True,
-    )
+        horizontal=True
+        )
+
     if st.session_state.upload_mode != upload_mode:
         st.session_state.start_analysis = False
         st.session_state.embeddings_generated = False
@@ -60,6 +71,7 @@ def run():
         st.session_state.combined_text = ''
         st.session_state.db_file_path = None
         st.session_state.chroma_database = None
+        st.session_state.messages = []
 
     st.session_state.upload_mode = upload_mode
 
@@ -119,25 +131,29 @@ def run():
 
     # --- CHATBOT INTERFACE ---
     if st.session_state.get("start_analysis", False):
-        st.markdown("---")
-        st.subheader("💬 Interactive Report Analysis")
-
         st.session_state.setdefault("chat_history", [])
-
-        user_input = st.text_input("Ask a question about the report:")
+        assistant = "💬 Interactive Report Analysis"
+        # user_input = st.text_input("Ask a question about the report:")
+        lang_eng = fl_config.translations['English']
+        user_input = chatbot.chat_buttons(lang_eng['chatbot_input'], assistant)
 
         if user_input:
-            # Placeholder chatbot response (replace with your model logic)
-            result = lap.text_retraivalQA(st.session_state.chroma_database, user_input)
-            dp.display_content(result)
-            # response = f"🤖 (Mock Response) The analysis for '{user_input}' will appear here."
-            st.session_state.chat_history.append((user_input, result['answer']))
+            response = lap.text_retraivalQA(st.session_state.chroma_database, user_input)
+            buffer_u.to_buffer(user_input, response['answer'])
+            dp.display_content(response)
 
-        # Display chat
-        for q, a in st.session_state.chat_history:
-            st.markdown(f"**🧑 You:** {q}")
-            st.markdown(f"**🤖 Bot:** {a}")
-            st.markdown("---")
+        # if user_input:
+        #     # Placeholder chatbot response (replace with your model logic)
+        #     result = lap.text_retraivalQA(st.session_state.chroma_database, user_input)
+        #     dp.display_content(result)
+        #     # response = f"🤖 (Mock Response) The analysis for '{user_input}' will appear here."
+        #     st.session_state.chat_history.append((user_input, result['answer']))
+
+        # # Display chat
+        # for q, a in st.session_state.chat_history:
+        #     st.markdown(f"**🧑 You:** {q}")
+        #     st.markdown(f"**🤖 Bot:** {a}")
+        #     st.markdown("---")
 
     # --- FOOTER BUTTONS ---
     st.markdown("<hr>", unsafe_allow_html=True)

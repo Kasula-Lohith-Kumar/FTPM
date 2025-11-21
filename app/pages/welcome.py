@@ -4,22 +4,14 @@ def run():
     # 🔹 CSS Reset and Styling
     st.markdown("""
         <style>
-        html, body, [class*="block-container"] {
-            all: unset;
+        html, body {
             font-family: "Source Sans Pro", sans-serif;
-            font-size: 16px !important;
-            line-height: 1.4;
             color: white;
         }
 
         .block-container {
-            padding: 0 !important;
-            margin: 0 auto !important;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 90vh; /* Center vertically */
-            flex-direction: column;
+            max-width: 95% !important;  /* <- Wider layout */
+            padding: 1rem 2rem !important;
         }
 
         h1, h2, h3, h4, h5, h6 {
@@ -114,8 +106,11 @@ def run():
     # --- Centered Feature Section ---
     st.markdown('<div class="feature-container">', unsafe_allow_html=True)
 
-    # Feature 1
-    col1, col2, col3 = st.columns(3)
+    left, center, right = st.columns([1,3,1])
+
+    with center:
+        col1, col2, col3 = st.columns([1,1,1])
+
     with col1:
         st.markdown('<div class="feature-box"><div class="feature-title">📈 Data-Driven Insights</div><div class="feature-desc">Analyze asset performance and track your holdings with real-time data visualizations.</div></div>', unsafe_allow_html=True)
         if st.button("Data Insights", key="insights"):
@@ -130,7 +125,6 @@ def run():
         st.markdown('<div class="feature-box"><div class="feature-title">📊 Annual Report Analyzer</div><div class="feature-desc">Upload and analyze company financial reports to uncover trends, key metrics, and performance insights.</div></div>', unsafe_allow_html=True)
         if st.button("Report Analyzer", key="tracking"):
             st.session_state.selected_option = "Report Analyzer"
-
     st.markdown('</div>', unsafe_allow_html=True)
 
     # --- NEXT STEPS SECTION ---
@@ -158,12 +152,14 @@ def run():
 
     # --- LOGOUT BUTTON ---
     st.markdown('<div style="margin-top: 40px; text-align:center;">', unsafe_allow_html=True)
-    if st.button("🏃 Logout", key="float_back"):
-        if 'selected_option' in st.session_state:
-            del st.session_state.selected_option
-        st.session_state['page_status'] = 'login'
-        st.switch_page("pages/login.py")
-    st.markdown('</div>', unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([5,1,2])
+    with col2:
+        if st.button("🏃 Logout", key="float_back"):
+            if 'selected_option' in st.session_state:
+                del st.session_state.selected_option
+            st.session_state['page_status'] = 'login'
+            st.switch_page("pages/login.py")
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # --- INITIALIZATION LOGIC (unchanged) ---
     if 'page_status' not in st.session_state:

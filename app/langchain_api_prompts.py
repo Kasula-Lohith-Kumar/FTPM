@@ -11,6 +11,7 @@ import streamlit as st
 from pathlib import Path
 import streamlit_secrets
 from openai import OpenAI
+from utils import buffer_u
 from langchain_openai import ChatOpenAI
 # from langchain_openai import OpenAITextToSpeech
 from langchain_core.runnables import RunnablePassthrough
@@ -22,7 +23,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 # from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores import Chroma
-import document_processor as dp
+from utils import document_processor as dp
 
 
 # --- Initialize buffer ---
@@ -124,12 +125,7 @@ def generate_quiz():
 
     except Exception as e:
         print(f"❌ Error generating quiz: {e}")
-        return None
-    
-def add_to_buffer(role, content):
-    st.session_state.buffer.append({"role": role, "content": content})
-    if len(st.session_state.buffer) > 10:
-        st.session_state.buffer = st.session_state.buffer[-10:]   
+        return None 
 
 def chat_bot():
     """
@@ -165,7 +161,7 @@ def chat_bot():
 
     # 🔹 Extract content and update buffer
     reply = response.content
-    add_to_buffer("assistant", reply)
+    buffer_u.add_to_buffer("assistant", reply)
 
     return reply
 

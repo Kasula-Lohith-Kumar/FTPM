@@ -1,12 +1,10 @@
 import streamlit as st
-from gtts import gTTS
-from streamlit_mic_recorder import mic_recorder
-import io
-from openai import OpenAI
+from utils import audio_u
+from utils import buffer_u
+from utils import chatbot
 from pages import fl_config
 # import openai_api_prompts as oap
 import langchain_api_prompts as lap
-import json
 from google_sheets.gsheets_operations import get_mappings
 from google_sheets import gsheets_operations as gso
 
@@ -42,61 +40,6 @@ def run():
         st.session_state.messages = []
     if "language" not in st.session_state:
         st.session_state.language = "English"
-
-    # --- Text-to-Speech helpers ---
-    def get_tts_lang(language):
-        mapping = {
-            "English": "en",
-            "తెలుగు (Telugu)": "te",
-            "हिंदी (Hindi)": "hi",
-            "தமிழ் (Tamil)": "ta",
-            "ಕನ್ನಡ (Kannada)": "kn",
-        }
-        return mapping.get(language, "en")
-
-    # def speak_text(text, language):
-    #     lang_code = get_tts_lang(language)
-    #     try:
-    #         tts = gTTS(text=text, lang=lang_code)
-    #         audio_bytes = io.BytesIO()
-    #         tts.write_to_fp(audio_bytes)
-    #         audio_bytes.seek(0)
-    #         st.audio(audio_bytes, format="audio/mp3")
-    #     except Exception as e:
-    #         st.error(f"Error generating audio: {e}")
-
-    def speak_text(text):
-        """
-        Wrapper around voice() to produce Streamlit-safe audio bytes.
-        """
-        audio_bytes = lap.voice(text)
-        if audio_bytes:
-            return audio_bytes
-        return None
-
-    def safe_speak(text, fallback_text):
-        try:
-            # Try primary text
-            audio = speak_text(text)
-            return audio
-
-        except Exception as e:
-            msg = str(e)
-
-            # Handle 429 rate limits
-            if "429" in msg or "Too Many Requests" in msg:
-                st.error("⚠️ Too many requests — playing fallback audio.")
-                try:
-                    return speak_text(fallback_text)
-                except:
-                    return None
-
-            # Other errors → fallback audio
-            st.error("⚠️ Error generating audio — playing fallback audio.")
-            try:
-                return speak_text(fallback_text)
-            except:
-                return None
 
     # --- Header & language setup ---
     lang = st.session_state.language
@@ -183,9 +126,9 @@ def run():
                 fallback_text = f"{topic_title}. " + t["topic_intro"]
 
                 if topic_text:
-                    audio = safe_speak(topic_text, fallback_text)
+                    audio = audio_u.safe_speak(topic_text, fallback_text)
                 else:
-                    audio = safe_speak(fallback_text, fallback_text)
+                    audio = audio_u.safe_speak(fallback_text, fallback_text)
 
                 if audio:
                     st.audio(audio, format="audio/mp3")
@@ -445,70 +388,10 @@ def run():
                     st.info(f"Q{i+1}. {q_text} — {fb.get('message','Evaluated.')}")
 
 
-    # --- Chatbot section with mic & speaker in ribbon ---
-    st.write("---")
-    st.markdown(f"### {t['assistant']}")
-
-    # Display chat messages
-    for msg in st.session_state.messages:
-        with st.chat_message(msg["role"]):
-            st.write(msg["content"])
-
-    # Input + mic + speaker ribbon
-    chat_col1, chat_col2, chat_col3 = st.columns([8, 1, 1])
-    # chat_col1, chat_col2, chat_col3 = st.columns([8, 1, 1])
-
-    with chat_col1:
-        user_input = st.chat_input(t.get("chatbot_input", "💬 ChatBot with 5 Messages Memory, Ask your question..."))
-
-
-    # with chat_col2:
-    #     st.write("Record your voice below:")
-    #     audio_input = st.audio_input("🎧 Record your voice")
-
-
-    with chat_col2:
-        if st.button("🔊", key="chat_speaker"):
-            fallback_text = 'Currently this audio feature is not supported'
-            if st.session_state.messages:
-                # speak_text(st.session_state.messages[-1]["content"], st.session_state.language)
-                audio = safe_speak(st.session_state.messages[-1]["content"], fallback_text)
-            else:
-                fallback_text = "No response to speak yet."
-                audio = safe_speak(fallback_text, fallback_text)
-                st.warning("No response to speak yet.")
-
-            if audio:
-                    st.audio(audio, format="audio/mp3")
-
-    with chat_col3:
-        if st.button("🚮 Clear Chat", key="clear_chat_history"):
-            st.session_state.messages = []
-            st.toast("Chat history cleared!", icon="🗑️")
-            st.rerun()   # 🔥 immediately refresh UI
-
-
-    # Process input or voice
-    # if audio_input:
-    #     st.info("⏳ Transcribing...")
-    #     try:
-    #         text = oap.audio_transcription(audio_input)
-    #         st.success("✅ Transcribed Text:")
-    #         st.write(text)
-    #     except Exception as e:
-    #         st.error(f"❌ Transcription failed: {e}")
-
-
-    if user_input:
-        lap.add_to_buffer("user", user_input)
-        # Display chat history
-        for msg in st.session_state.buffer:
-            with st.chat_message(msg["role"]):
-                # st.markdown(msg["content"])
-                reply = lap.chat_bot()
-                st.session_state.messages.append({"role": "user", "content": user_input})
-                st.session_state.messages.append({"role": "assistant", "content": reply})
-                st.rerun()
+    bot_input = t.get("chatbot_input", "💬 ChatBot with 5 Messages Memory, Ask your question...")
+    user_input = chatbot.chat_buttons(bot_input, t['assistant'])
+    reply = lap.chat_bot()
+    buffer_u.to_buffer(user_input, reply)
 
     # --- Navigation buttons ---
     st.write("---")
