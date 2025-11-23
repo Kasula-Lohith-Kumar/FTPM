@@ -27,3 +27,7 @@ def clear_buffer():
             st.session_state.messages = []
             st.toast(ch_clear_msg, icon=bin_icon)
             st.rerun()   # 🔥 immediately refresh UI
+
+def force_clear_buffer():
+        st.session_state.messages = []
+        st.session_state.buffer = []

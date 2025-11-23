@@ -164,6 +164,7 @@ def run():
         if st.button("🏠 Return to Dashboard"):
             st.session_state['page_status'] = 'welcome'
             del st.session_state.selected_option
+            buffer_u.force_clear_buffer()
             st.switch_page("pages/welcome.py")
 
     with col2:
@@ -173,6 +174,7 @@ def run():
             st.session_state.clear()
             st.success("You have been logged out.")
             st.session_state['page_status'] = 'login'
+            buffer_u.force_clear_buffer()
             st.switch_page("pages/login.py")
 
 
