@@ -4,7 +4,6 @@ def show_home_content():
     # Hide sidebar and set custom CSS
     st.markdown("""
     <style>
-        /* Hide Streamlit's default elements for the home page */
         [data-testid="stSidebarNav"],
         section[data-testid="stSidebar"],
         [data-testid="collapsedControl"] {
@@ -35,16 +34,14 @@ def show_home_content():
             margin-bottom: 2rem;
         }
 
-        /* ---------- FEATURE ROW (flex) ---------- */
         .feature-row {
             display: flex !important;
             flex-direction: row !important;
             gap: 1rem !important;
-            align-items: stretch !important; /* core: stretch columns to same height */
+            align-items: stretch !important;
             width: 100%;
         }
 
-        /* Target Streamlit's nested column wrappers aggressively and force them to stretch */
         .feature-row > div,
         .feature-row > div > div,
         .feature-row > div > div > div,
@@ -53,31 +50,26 @@ def show_home_content():
             display: flex !important;
             flex-direction: column !important;
             flex: 1 1 0% !important;
-            padding: 0 !important; /* remove added padding interfering with height */
+            padding: 0 !important;
             margin: 0 !important;
         }
 
-        /* Feature Box styling - box itself stretches and is a column flex container */
         .feature-box {
-            background-color: #0E1117;
-            border: 1px solid #262730;
-            border-radius: 14px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: flex-start;
-            align-items: stretch;
-            height: 100% !important;      /* ensure it fills the column */
-            min-height: 312px;            /* defensive fallback to ensure visual parity */
-        }
+        background-color: #0E1117;
+        border: 1px solid #262730;
+        border-radius: 14px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start;
+        align-items: stretch;
 
-        .feature-box > * {
-            /* avoid inner markdown margins causing visual height differences */
-            margin: 0;
-            padding: 0;
+        /* 🔥 new size control */
+        width: 275px !important;
+        min-height: 200px !important;
         }
 
         .feature-box:hover {
@@ -100,46 +92,20 @@ def show_home_content():
         .feature-desc {
             font-size: 0.95rem;
             color: #B0B0B0;
-            margin-top: auto; /* ensures description sits nicely towards the bottom if content is short */
             line-height: 1.5;
         }
 
-        /* Button styling (unchanged, kept strong) */
-        .stButton > button {
-            background-color: #4169E1 !important;
-            color: white !important;
-            font-weight: 600 !important;
-            border-radius: 10px !important;
-            font-size: 1.05rem !important;
-            padding: 0.75rem 2.5rem !important;
-            border: none !important;
-            width: 100% !important;
-            max-width: 600px !important;
-            box-shadow: 0 4px 10px rgba(65, 105, 225, 0.4) !important;
-            transition: all 0.3s ease-in-out !important;
-        }
-
-        .stButton > button:hover {
-            background-color: #3650B3 !important;
-            transform: translateY(-2px) !important;
-            box-shadow: 0 6px 14px rgba(65, 105, 225, 0.5) !important;
-        }
-
-        /* Small responsive tweak so columns stack nicely on small screens */
         @media (max-width: 900px) {
             .feature-row { flex-direction: column !important; }
             .feature-box { min-height: 220px; }
         }
     </style>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-
-    # ---- Title ----
     st.markdown('<h1 class="main-title">Lohith\'s Finance App</h1>', unsafe_allow_html=True)
     st.markdown('<p class="subtitle">The Smart Way to <b>Manage Your Portfolio</b> and <b>Master Finance</b> 💰📈</p>', unsafe_allow_html=True)
 
-    # ---- Image and Intro ----
-    col1, col2 = st.columns([1, 2], vertical_alignment="center")
+    col1, col2 = st.columns([1, 2])
     with col1:
         st.image("app/pages/image_ai.png", use_container_width=True) 
     with col2:
@@ -147,25 +113,11 @@ def show_home_content():
 
     st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # ---- Feature Cards (Wrapped in custom div for Flexbox) ----
-    
-    # 1. Start of the custom feature row container
-    st.markdown('<div class="feature-row">', unsafe_allow_html=True) 
-    
-    # 2. Define Streamlit columns inside the custom div
-    c1, c2, c3 = st.columns(3)
-    
-    # 3. Insert content
-    with c1:
-        st.markdown("""
-            <div class="feature-box">
-                <div class="feature-icon">📈</div>
-                <div class="feature-title">Data-Driven Insights</div>
-                <div class="feature-desc">Analyze asset performance and track your holdings with real-time data visualizations.</div>
-            </div>
-        """, unsafe_allow_html=True)
+    # Feature Cards (updated: only 2)
+    st.markdown('<div class="feature-row">', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
 
-    with c2:
+    with c1:
         st.markdown("""
             <div class="feature-box">
                 <div class="feature-icon">🧠</div>
@@ -174,15 +126,15 @@ def show_home_content():
             </div>
         """, unsafe_allow_html=True)
 
-    with c3:
+    with c2:
         st.markdown("""
             <div class="feature-box">
                 <div class="feature-icon">📊</div>
                 <div class="feature-title">Annual Report Analyzer</div>
-                <div class="feature-desc">Upload and analyze company financial reports to uncover trends, key metrics, and performance insights.</div>
+                <div class="feature-desc">Upload and analyze company financial reports to uncover insights and performance metrics.</div>
             </div>
         """, unsafe_allow_html=True)
-        
+
     # 4. End of the custom feature row container
     st.markdown('</div>', unsafe_allow_html=True) 
 
@@ -204,6 +156,26 @@ def show_home_content():
         """,
         unsafe_allow_html=True
     )
+    st.markdown("""
+    <style>
+
+    div.stButton > button {
+        background-color: #00b894 !important; /* Change color */
+        color: white !important;              /* Text color */
+        border-radius: 12px !important;       /* Rounded corners */
+        font-size: 18px !important;
+        padding: 12px 24px !important;
+        border: none !important;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    div.stButton > button:hover {
+        background-color: #019267 !important; /* Hover effect */
+    }
+
+    </style>
+    """, unsafe_allow_html=True)
 
     # Launch Button 
     if st.button("Launch Your Portfolio Dashboard 🚀", use_container_width=True):
@@ -211,9 +183,8 @@ def show_home_content():
         st.switch_page("pages/login.py")
 
 
-# ✅ Render only if on home page
-if 'page_status' not in st.session_state:
-        st.session_state['page_status'] = 'home'
+if "page_status" not in st.session_state:
+    st.session_state["page_status"] = "home"
 
-if st.session_state.get('page_status') == 'home':
+if st.session_state["page_status"] == "home":
     show_home_content()
