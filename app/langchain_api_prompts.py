@@ -21,6 +21,7 @@ from langchain_community.document_loaders.parsers import OpenAIWhisperParser
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
+from langchain_classic.chains import RetrievalQA
 # from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores import Chroma
 from utils import document_processor as dp
@@ -161,7 +162,7 @@ def chat_bot():
 
     # 🔹 Extract content and update buffer
     reply = response.content
-    buffer_u.add_to_buffer("assistant", reply)
+    buffer_u.add_to_buffer("assistant", reply, "text")
 
     return reply
 
@@ -312,40 +313,66 @@ def chroma_db(splits):
     return db
 
 
+# def text_retraivalQA(database, query):
+
+#     retriever = database.as_retriever()
+
+#     llm = ChatOpenAI(model="gpt-4o", temperature=0,
+#                      api_key=streamlit_secrets.get_openai_key())
+
+#     template = """Use the following pieces of context to answer the question at the end.
+#     If you don't know the answer, say you don't know. Along with the image name if exists.
+#     The Image extension would be .png.
+
+#     {context}
+
+#     Question: {question}
+
+#     Helpful Answer:"""
+
+#     QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
+
+#     # FIX: Include return of source documents
+#     chain = (
+#         {"context": retriever, "question": RunnablePassthrough()}
+#         | QA_CHAIN_PROMPT
+#         | llm
+#     )
+
+#     # Call the retriever separately
+#     docs = retriever.invoke(query)
+
+#     answer = chain.invoke(query)
+
+#     dp.display_content(docs)
+
+#     return {
+#         "answer": answer.content,
+#         "source_documents": docs
+#     }
+
 def text_retraivalQA(database, query):
 
-    retriever = database.as_retriever()
-
     llm = ChatOpenAI(model="gpt-4o", temperature=0,
-                     api_key=streamlit_secrets.get_openai_key())
+                api_key=streamlit_secrets.get_openai_key())
 
-    template = """Use the following pieces of context to answer the question at the end.
-    If you don't know the answer, say you don't know.
-
+    template = """Use the following pieces of context to answer the question at the end. 
+    If you don't know the answer and dont find it in the given context, 
+    just say that you don't know , don't try to make up an answer.
     {context}
-
     Question: {question}
-
     Helpful Answer:"""
-
     QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
 
-    # FIX: Include return of source documents
-    chain = (
-        {"context": retriever, "question": RunnablePassthrough()}
-        | QA_CHAIN_PROMPT
-        | llm
+    qa_chain = RetrievalQA.from_chain_type(
+    llm,
+    retriever=database.as_retriever(),
+    return_source_documents=True,
+    chain_type_kwargs={"prompt": QA_CHAIN_PROMPT}
     )
+    result = qa_chain({"query": query})
 
-    # Call the retriever separately
-    docs = retriever.invoke(query)
-
-    answer = chain.invoke(query)
-
-    return {
-        "answer": answer.content,
-        "source_documents": docs
-    }
+    return result
 
 def save_embd(db, dst_file):
     os.makedirs(dst_file, exist_ok=True)

@@ -7,12 +7,8 @@ def chat_buttons(input_msg, asst_text):
     fallback_text = 'Currently this audio feature is not supported'
     warning_msg = "No response to speak yet."
     speaker_key = "chat_speaker"
-    cc_key = "clear_chat_history"
     audio_foramt = "audio/mp3"
-    cc_button_name = "🚮 Clear Chat"
     speaker_icon = "🔊"
-    bin_icon = "🗑️"
-    ch_clear_msg = "Chat history cleared!"
 
     # --- Chatbot section with mic & speaker in ribbon ---
     st.write("---")

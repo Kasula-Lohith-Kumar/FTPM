@@ -1,6 +1,7 @@
 import os
 import uuid
 import config
+import cv2
 import streamlit as st
 from utils import chatbot
 from utils import buffer_u
@@ -45,12 +46,13 @@ def run():
     st.sidebar.info("Use this page to upload your documents or vector embeddings for analysis.")
 
     # --- SESSION STATE INITIALIZATION ---
-    st.session_state.setdefault("upload_mode", "Document")
+    st.session_state.setdefault("upload_mode", "📄 Upload Document")
     st.session_state.setdefault("embeddings_generated", False)
     st.session_state.setdefault("temp_embedding_path", None)
     st.session_state.setdefault("start_analysis", False)
     st.session_state.setdefault("messages", [])
     st.session_state.setdefault("language", "English")
+    st.session_state.setdefault("upload_temp_path", None)
 
     # Center title
     st.markdown("<h4 style='text-align:center;'>Choose Upload Mode</h4>", unsafe_allow_html=True)
@@ -75,18 +77,18 @@ def run():
 
     st.session_state.upload_mode = upload_mode
 
+    if st.session_state.upload_temp_path == None:
+        st.session_state.upload_temp_path = os.path.join(config.WORKING_DIR, str(uuid.uuid4()))
+
     # --- FILE UPLOAD SECTION ---
     if upload_mode == "📄 Upload Document":
         st.write("### Upload Your Document")
         uploaded_doc = st.file_uploader("Upload a PDF, DOCX, or TXT file", type=["pdf", "docx", "txt"])
 
         if uploaded_doc:
-            st.session_state['upload_temp_path'] = None
-            temp_path = os.path.join(config.WORKING_DIR, str(uuid.uuid4()))
-            if not os.path.exists(temp_path):
-                os.makedirs(temp_path)
-            st.session_state.upload_temp_path = temp_path
-            temp_doc_path = os.path.join(temp_path, uploaded_doc.name)
+            if not os.path.exists(st.session_state.upload_temp_path):
+                os.makedirs(st.session_state.upload_temp_path)
+            temp_doc_path = os.path.join(st.session_state.upload_temp_path, uploaded_doc.name)
             print(f'temp_doc_path: {temp_doc_path}')
             with open(temp_doc_path, "wb") as f:
                 f.write(uploaded_doc.getbuffer())
@@ -126,34 +128,51 @@ def run():
         uploaded_embeddings = st.file_uploader("Upload your Chroma DB (.zip)", type=["zip"])
         if uploaded_embeddings:
             st.session_state.chroma_database = lap.load_chroma_from_zip(uploaded_embeddings)
+
             if st.button("🚀 Start Analysis"):
                 st.session_state.start_analysis = True
 
-    # --- CHATBOT INTERFACE ---
-    if st.session_state.get("start_analysis", False):
-        st.session_state.setdefault("chat_history", [])
+
+    if st.session_state.start_analysis:
+        # ---------- Render chat history (always run) ----------
+        for msg in st.session_state.buffer:
+            with st.chat_message(msg["role"]):
+                if msg["type"] == "text":
+                    st.markdown(msg["content"])
+                elif msg["type"] == "image":
+                    print(f'msg["type"] : {msg["type"]}')
+                    if os.path.exists(msg["content"]):
+                        img = cv2.imread(msg["content"])
+                        if img is None:
+                            st.warning(f"Unable to read image: {msg['content']}")
+                        else:
+                            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                            st.image(img_rgb, use_container_width=True)
+                    else:
+                        st.warning(f"⚠️ Missing image: {msg['content']}")
+
+
+        # ---------- Chat input (always last so it's at the bottom) ----------
         assistant = "💬 Interactive Report Analysis"
-        # user_input = st.text_input("Ask a question about the report:")
-        lang_eng = fl_config.translations['English']
+        lang_eng = fl_config.translations['English']  # your existing config
         user_input = chatbot.chat_buttons(lang_eng['chatbot_input'], assistant)
 
         if user_input:
+            # get reply and optional image path from your pipeline
             response = lap.text_retraivalQA(st.session_state.chroma_database, user_input)
-            buffer_u.to_buffer(user_input, response['answer'])
-            dp.display_content(response)
+            print(f"response for test : {response}")
+            # reply_text = response.get("answer", "")
+            reply_text = response["source_documents"][0]
+            print(f'reply_text : {reply_text}')
+            dp.display_content(reply_text)
+            
+            # image_path = response.get("image")  # set this in text_retraivalQA if applicable
 
-        # if user_input:
-        #     # Placeholder chatbot response (replace with your model logic)
-        #     result = lap.text_retraivalQA(st.session_state.chroma_database, user_input)
-        #     dp.display_content(result)
-        #     # response = f"🤖 (Mock Response) The analysis for '{user_input}' will appear here."
-        #     st.session_state.chat_history.append((user_input, result['answer']))
+            # to debug, you can force an image path like:
+            # image_path = "/mnt/data/046748b2-f144-4227-82fe-c1a812e37d80.png"
 
-        # # Display chat
-        # for q, a in st.session_state.chat_history:
-        #     st.markdown(f"**🧑 You:** {q}")
-        #     st.markdown(f"**🤖 Bot:** {a}")
-        #     st.markdown("---")
+            # store in correct order and rerun
+            # buffer_u.to_buffer_rag(user_input, reply_text, image_path)
 
     # --- FOOTER BUTTONS ---
     st.markdown("<hr>", unsafe_allow_html=True)
@@ -163,6 +182,7 @@ def run():
         if st.button("🏠 Return to Dashboard"):
             st.session_state['page_status'] = 'welcome'
             del st.session_state.selected_option
+            buffer_u.force_clear_buffer()
             st.switch_page("pages/welcome.py")
 
     with col2:
@@ -172,8 +192,8 @@ def run():
             st.session_state.clear()
             st.success("You have been logged out.")
             st.session_state['page_status'] = 'login'
+            buffer_u.force_clear_buffer()
             st.switch_page("pages/login.py")
-
 
 # --- INITIALIZATION HANDLING ---
 if 'page_status' not in st.session_state:

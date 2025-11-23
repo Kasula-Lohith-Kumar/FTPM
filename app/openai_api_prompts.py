@@ -84,12 +84,6 @@ def generate_quiz():
 
     return quiz_data
 
-def add_to_buffer(role, content):
-    st.session_state.buffer.append({"role": role, "content": content})
-    if len(st.session_state.buffer) > 10:
-        st.session_state.buffer = st.session_state.buffer[-10:]
-
-
 def chat_bot():
     response = client.chat.completions.create(
             model="gpt-4.1-mini",
@@ -100,7 +94,7 @@ def chat_bot():
             *st.session_state.buffer],
     )
     reply = response.choices[0].message.content
-    add_to_buffer("assistant", reply)
+    add_to_buffer("assistant", reply, "text")
     return reply
 
 

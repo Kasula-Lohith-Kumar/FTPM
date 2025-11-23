@@ -398,6 +398,7 @@ def run():
 
     def go_previous_step():
         st.session_state['page_status'] = 'financial_literacy'
+        buffer_u.force_clear_buffer()
         st.switch_page("pages/financial_literacy.py")
 
     def mark_complete_and_go_next():
@@ -408,11 +409,13 @@ def run():
             gso.write_to_cell(gso.get_topics_status_cell_id(st.session_state.username), st.session_state.completed_topics)
             del st.session_state.messages
         st.toast("Topic completed! Proceeding to the next lesson.")
+        buffer_u.force_clear_buffer()
         st.switch_page("pages/financial_literacy.py")
 
     def go_to_dashboard():
         st.session_state['page_status'] = 'welcome'
         del st.session_state.selected_option
+        buffer_u.force_clear_buffer()
         st.switch_page("pages/welcome.py")
 
     col1, col2, col3 = st.columns([1, 1, 2])

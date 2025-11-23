@@ -6,16 +6,20 @@ import base64
 import config
 import pandas as pd
 import streamlit as st
+from utils import buffer_u
 import matplotlib.pyplot as plt
 import langchain_api_prompts as lap
 
 
 def get_image_folder_path():
-    image_path = os.path.join(st.session_state.upload_temp_path, config.IMAGE_FOLDER_PATH)
+    if st.session_state.upload_mode == "📄 Upload Document":
+        base_path = st.session_state.upload_temp_path
+    else:
+        base_path = config.EMBBED_EXRT_PATH
+    image_path = os.path.join(base_path, config.IMAGE_FOLDER_PATH)
     if not os.path.exists(image_path):
                 os.makedirs(image_path)
     return image_path
-
 
 # Open the image file and encode it as a base64 string
 def encode_image(image_path):
@@ -82,24 +86,20 @@ def extract_image_references(text):
 def display_image(image_path):
     # Check if the image file exists
     if os.path.exists(image_path):
-        # Load and display the image
-        image = cv2.imread(image_path)
-        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        plt.imshow(image_rgb)
-        plt.axis('off')  # Hide axis
-        plt.show()
+        buffer_u.add_to_buffer_rag("assistant", image_path, "image")
     else:
         st.error(f"Image file {image_path} not found.")
 
 def display_content(result):
-
+    print('Inside display content')
     image_folder_path = get_image_folder_path()
     image_references = extract_image_references(
-        result["source_documents"][0].page_content)
+        result.page_content)
+    print(f'image_references : {image_references}')
     
     for image_file in image_references:
         image_path = os.path.join(image_folder_path, image_file)
-        print(f"Displaying {image_file}...")
+        print(f"Displaying {image_path}...")
         display_image(image_path)
 
 def list_dir_content(path):
