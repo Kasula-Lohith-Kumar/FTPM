@@ -162,7 +162,7 @@ def chat_bot():
 
     # 🔹 Extract content and update buffer
     reply = response.content
-    buffer_u.add_to_buffer("assistant", reply, "text")
+    buffer_u.add_to_buffer("assistant", reply)
 
     return reply
 
