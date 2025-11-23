@@ -75,18 +75,18 @@ def run():
 
     st.session_state.upload_mode = upload_mode
 
+    if st.session_state.upload_temp_path == None:
+        st.session_state.upload_temp_path = os.path.join(config.WORKING_DIR, str(uuid.uuid4()))
+
     # --- FILE UPLOAD SECTION ---
     if upload_mode == "📄 Upload Document":
         st.write("### Upload Your Document")
         uploaded_doc = st.file_uploader("Upload a PDF, DOCX, or TXT file", type=["pdf", "docx", "txt"])
 
         if uploaded_doc:
-            st.session_state['upload_temp_path'] = None
-            temp_path = os.path.join(config.WORKING_DIR, str(uuid.uuid4()))
-            if not os.path.exists(temp_path):
-                os.makedirs(temp_path)
-            st.session_state.upload_temp_path = temp_path
-            temp_doc_path = os.path.join(temp_path, uploaded_doc.name)
+            if not os.path.exists(st.session_state.upload_temp_path):
+                os.makedirs(st.session_state.upload_temp_path)
+            temp_doc_path = os.path.join(st.session_state.upload_temp_path, uploaded_doc.name)
             print(f'temp_doc_path: {temp_doc_path}')
             with open(temp_doc_path, "wb") as f:
                 f.write(uploaded_doc.getbuffer())
