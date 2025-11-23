@@ -51,6 +51,7 @@ def run():
     st.session_state.setdefault("start_analysis", False)
     st.session_state.setdefault("messages", [])
     st.session_state.setdefault("language", "English")
+    st.session_state.setdefault("upload_temp_path", None)
 
     # Center title
     st.markdown("<h4 style='text-align:center;'>Choose Upload Mode</h4>", unsafe_allow_html=True)
