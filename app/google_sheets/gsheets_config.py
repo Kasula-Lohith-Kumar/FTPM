@@ -1,5 +1,5 @@
 SPREADSHEET_ID = '1TxGh-JuEWEmopvpHosUnDfstPGSYH_CzzOJCkCTWuaE'
-LOCAL_KEY_PATH = r"app\google_sheets\financetutorapp-562157097710.json"
+LOCAL_KEY_PATH = r"app\google_sheets\gsheets.json"
 USERS_TAB_NAME = "UserData"
 TOPICS_TAB = "Topics"
 KEY_FILE_DATA = None

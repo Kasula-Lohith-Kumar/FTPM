@@ -30,5 +30,5 @@ key.py
 .cache/
 
 #service account files
-app/google_sheets/financetutorapp-562157097710.json
+app/google_sheets/gsheets.json
 app/google_sheets/streamlit.toml

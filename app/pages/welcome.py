@@ -109,19 +109,14 @@ def run():
     left, center, right = st.columns([1,3,1])
 
     with center:
-        col1, col2, col3 = st.columns([1,1,1])
+        col_space, col1, col2 = st.columns([0.5,1,1])
 
     with col1:
-        st.markdown('<div class="feature-box"><div class="feature-title">📈 Data-Driven Insights</div><div class="feature-desc">Analyze asset performance and track your holdings with real-time data visualizations.</div></div>', unsafe_allow_html=True)
-        if st.button("Data Insights", key="insights"):
-            st.session_state.selected_option = "Data Insights"
-
-    with col2:
         st.markdown('<div class="feature-box"><div class="feature-title">🧠 Financial Literacy</div><div class="feature-desc">Access interactive tutorials and definitions to build a strong foundation in finance.</div></div>', unsafe_allow_html=True)
         if st.button("Financial Literacy", key="literacy"):
             st.session_state.selected_option = "Financial Literacy"
 
-    with col3:
+    with col2:
         st.markdown('<div class="feature-box"><div class="feature-title">📊 Annual Report Analyzer</div><div class="feature-desc">Upload and analyze company financial reports to uncover trends, key metrics, and performance insights.</div></div>', unsafe_allow_html=True)
         if st.button("Report Analyzer", key="tracking"):
             st.session_state.selected_option = "Report Analyzer"
@@ -152,7 +147,7 @@ def run():
 
     # --- LOGOUT BUTTON ---
     st.markdown('<div style="margin-top: 40px; text-align:center;">', unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([5,1,2])
+    col1, col2, col3 = st.columns([6.2,1,2])
     with col2:
         if st.button("🏃 Logout", key="float_back"):
             if 'selected_option' in st.session_state:
