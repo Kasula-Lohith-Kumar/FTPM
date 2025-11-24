@@ -19,9 +19,10 @@ def chat_buttons(input_msg, asst_text):
     st.markdown(f"### {asst_text}")
 
     # Display chat messages
-    for msg in st.session_state.messages:
-        with st.chat_message(msg["role"]):
-            st.write(msg["content"])
+    if st.session_state.messages:
+        for msg in st.session_state.messages:
+            with st.chat_message(msg["role"]):
+                st.write(msg["content"])
 
     chat_col1, chat_col2, chat_col3 = st.columns([8, 1, 1])
 
