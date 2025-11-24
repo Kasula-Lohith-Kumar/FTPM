@@ -136,7 +136,7 @@ def run():
         assistant = "💬 Interactive Report Analysis"
         # user_input = st.text_input("Ask a question about the report:")
         lang_eng = fl_config.translations['English']
-        user_input = chatbot.chat_buttons(lang_eng['chatbot_input'], assistant)
+        user_input = chatbot.chat_buttons('Ask anything related to uploaded document', assistant)
 
         if user_input:
             response = lap.text_retraivalQA(st.session_state.chroma_database, user_input)
