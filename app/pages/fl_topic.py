@@ -388,10 +388,12 @@ def run():
                     st.info(f"Q{i+1}. {q_text} — {fb.get('message','Evaluated.')}")
 
 
-    bot_input = t.get("chatbot_input", "💬 ChatBot with 5 Messages Memory, Ask your question...")
+    bot_input = t.get("chatbot_input", "💬 Ask your question...")
     user_input = chatbot.chat_buttons(bot_input, t['assistant'])
-    reply = lap.chat_bot()
-    buffer_u.to_buffer(user_input, reply)
+
+    if user_input:
+        reply = lap.chat_bot(user_input)
+        buffer_u.to_buffer(user_input, reply)
 
     # --- Navigation buttons ---
     st.write("---")

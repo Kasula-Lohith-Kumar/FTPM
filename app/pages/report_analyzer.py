@@ -140,7 +140,7 @@ def run():
 
         if user_input:
             response = lap.text_retraivalQA(st.session_state.chroma_database, user_input)
-            buffer_u.to_buffer(user_input, response['answer'])
+            buffer_u.to_buffer_rag(user_input, response['answer'])
             dp.display_content(response)
 
         # if user_input:

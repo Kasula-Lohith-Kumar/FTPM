@@ -1,7 +1,7 @@
 
 import streamlit as st
 
-def to_buffer(user_input, reply):
+def to_buffer_rag(user_input, reply):
     if user_input:
         add_to_buffer("user", user_input)
         # Display chat history
@@ -11,6 +11,13 @@ def to_buffer(user_input, reply):
                 st.session_state.messages.append({"role": "user", "content": user_input})
                 st.session_state.messages.append({"role": "assistant", "content": reply})
                 st.rerun()
+
+
+def to_buffer(user_input, reply):
+    if user_input:
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        st.session_state.messages.append({"role": "assistant", "content": reply})
+        st.rerun()
 
 def add_to_buffer(role, content):
     st.session_state.buffer.append({"role": role, "content": content})

@@ -127,43 +127,69 @@ def generate_quiz():
         print(f"❌ Error generating quiz: {e}")
         return None 
 
-def chat_bot():
-    """
-    Chat-based assistant using LangChain's ChatOpenAI.
-    Uses Streamlit session_state for context memory.
-    """
+# def chat_bot():
+#     """
+#     Chat-based assistant using LangChain's ChatOpenAI.
+#     Uses Streamlit session_state for context memory.
+#     """
 
-    # 🔹 Prepare the system prompt dynamically
+#     # 🔹 Prepare the system prompt dynamically
+#     system_prompt = f"""
+#     You are a helpful assistant who is an expert in finance. 
+#     Help the user clarify their doubts.
+#     Politely ignore queries that are unrelated to finance — say something like 
+#     "Please stay on our current learning topic."
+#     Always respond in {st.session_state.language}, unless the user explicitly asks for another language.
+#     """
+
+#     llm = ChatOpenAI(
+#     model="gpt-4.1-mini",
+#     api_key=streamlit_secrets.get_openai_key(),
+#     temperature=0.7  # adjust as needed
+#     )
+
+#     # 🔹 Convert session_state.buffer → LangChain message objects
+#     messages = [SystemMessage(content=system_prompt)]
+#     for msg in st.session_state.buffer:
+#         if msg["role"] == "user":
+#             messages.append(HumanMessage(content=msg["content"]))
+#         elif msg["role"] == "assistant":
+#             messages.append(AIMessage(content=msg["content"]))
+
+#     # 🔹 Get the model's reply
+#     response = llm.invoke(messages)
+
+#     # 🔹 Extract content and update buffer
+#     reply = response.content
+#     buffer_u.add_to_buffer("assistant", reply)
+
+#     return reply
+
+def chat_bot(user_input):
     system_prompt = f"""
     You are a helpful assistant who is an expert in finance. 
-    Help the user clarify their doubts.
-    Politely ignore queries that are unrelated to finance — say something like 
-    "Please stay on our current learning topic."
-    Always respond in {st.session_state.language}, unless the user explicitly asks for another language.
+    Respond only to finance questions. Otherwise say: 'Please stay on the topic.'
+    Always respond in {st.session_state.language}.
     """
 
-    llm = ChatOpenAI(
-    model="gpt-4.1-mini",
-    api_key=streamlit_secrets.get_openai_key(),
-    temperature=0.7  # adjust as needed
-    )
+    llm = ChatOpenAI(model="gpt-4.1-mini",
+                     api_key=streamlit_secrets.get_openai_key(),
+                     temperature=0.6)
 
-    # 🔹 Convert session_state.buffer → LangChain message objects
     messages = [SystemMessage(content=system_prompt)]
-    for msg in st.session_state.buffer:
+
+    for msg in st.session_state.messages:
         if msg["role"] == "user":
             messages.append(HumanMessage(content=msg["content"]))
-        elif msg["role"] == "assistant":
+        else:
             messages.append(AIMessage(content=msg["content"]))
 
-    # 🔹 Get the model's reply
+    if user_input:
+        messages.append(HumanMessage(content=user_input))
+
     response = llm.invoke(messages)
+    return response.content
 
-    # 🔹 Extract content and update buffer
-    reply = response.content
-    buffer_u.add_to_buffer("assistant", reply)
-
-    return reply
 
 def audio_transcription(audio_file):
     """

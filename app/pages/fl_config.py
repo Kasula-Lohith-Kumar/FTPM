@@ -22,7 +22,7 @@ translations = {
     "mic_button": "🎙️ Speak to Chatbot",
     "assistant": "🤖 Chatbot Assistant",
     "new_response": "♻️ New Response",
-    "chatbot_input": "💬 ChatBot with 5 Messages Memory, Ask your question...",
+    "chatbot_input": "💬 Ask your question...",
     "submit_all" : "✅ Submit All",
     "start_quiz" : "🚀 Start Quiz"
   },
@@ -49,7 +49,7 @@ translations = {
     "mic_button": "🎙️ బాట్‌తో మాట్లాడండి",
     "assistant" : "🤖 చాట్‌బాట్ అసిస్టెంట్",
     "new_response": "♻️ కొత్త సమాధానం",
-    "chatbot_input": "💬 5 సందేశాల జ్ఞాపకశక్తి ఉన్న చాట్‌బాట్, మీ ప్రశ్నను అడగండి...",
+    "chatbot_input": "💬 మీ ప్రశ్నను అడగండి...",
     "submit_all" : "✅ అన్నీ సమర్పించు",
     "start_quiz" : "🚀 క్విజ్ ప్రారంభించు"
 
@@ -77,7 +77,7 @@ translations = {
     "mic_button": "🎙️ चैटबॉट से बात करें",
     "assistant": "🤖 चैटबॉट सहायक",
     "new_response": "♻️ नया उत्तर",
-    "chatbot_input": "💬 5 संदेशों की याददाश्त वाला चैटबॉट, अपना प्रश्न पूछें...",
+    "chatbot_input": "💬 अपना प्रश्न पूछें...",
     "submit_all" : "✅ सबमिट करें",
     "start_quiz" : "🚀 क्विज़ शुरू करें"
   },
@@ -104,7 +104,7 @@ translations = {
     "mic_button": "🎙️ போட் உடன் பேசவும்",
     "assistant": "🤖 சாட்பாட் உதவியாளர்",
     "new_response": "♻️ புதிய பதில்",
-    "chatbot_input": "💬 5 செய்தி நினைவாற்றல் கொண்ட சாட்பாட், உங்கள் கேள்வியை கேளுங்கள்...",
+    "chatbot_input": "💬 உங்கள் கேள்வியை கேளுங்கள்...",
     "submit_all" : "✅ அனைத்தையும் சமர்ப்பிக்கவும்",
     "start_quiz" : "🚀 வினாடி வினா தொடங்கு"
   },
@@ -131,7 +131,7 @@ translations = {
     "mic_button": "🎙️ ಬಾಟ್‌ನೊಂದಿಗೆ ಮಾತನಾಡಿ",
     "assistant": "🤖 ಚಾಟ್‌ಬಾಟ್ ಸಹಾಯಕ",
     "new_response": "♻️ ಹೊಸ ಉತ್ತರ",
-    "chatbot_input": "💬 5 ಸಂದೇಶಗಳ ಮೆಮೊರಿಯುಳ್ಳ ಚಾಟ್‌ಬಾಟ್, ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಕೇಳಿ...",
+    "chatbot_input": "💬 ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಕೇಳಿ...",
     "submit_all" : "✅ ಎಲ್ಲವನ್ನು ಸಲ್ಲಿಸಿ",
     "start_quiz" : "🚀 ಪ್ರಶ್ನೆಪತ್ರಿಕೆ ಪ್ರಾರಂಭಿಸಿ"
   }
